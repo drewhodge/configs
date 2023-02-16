@@ -9,6 +9,12 @@
 ; 10.Feb.2023    Tested and refined config.                                  ;
 ; 11.Feb.2023    Installed and setup Denote to nmanage bibtex files.         ;
 ; 12.Feb.2023    Installed pdf-tools.                                        ;
+; 14.Feb.2023    Minor refinements to denote setup.                          ;
+; 15.Feb.2023    Installed and configured sagemath.                          ;
+;                Configure eww to use a 'pretty hydra'.                      ;
+;                Installed 0rg-remark for text highlighting.                 ;
+; 16.Feb.2023    Customized org-remak pens and marginalia file.              ;
+;                Minor changes to sagemath config.                           ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -134,6 +140,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(calendar-today ((t :background "red")))
  '(link ((t (:foreground "#d3869b" :underline t :weight normal)))))
 
 ;; Modeline
@@ -723,6 +730,59 @@
   (setq org-static-blog-index-front-matter
         "<h1> Welcome to my blog </h1>\n"))
 
+;; Setup org-remark
+(use-package org-remark
+  :ensure t
+  :custom
+  (org-remark-notes-file-name #'org-remark-notes-file-name-function)
+  :config
+  ; (org-remark-global-tracking-mode +1)
+
+  ;; Optional if you would like to highlight websites via eww-mode
+  (with-eval-after-load 'eww
+    (org-remark-eww-mode +1))
+
+  ;; Key-bind `org-remark-mark' to global-map so that you can call it
+  ;; globally before the library is loaded.
+  (define-key global-map (kbd "C-c n m") #'org-remark-mark)
+
+  ;; The rest of keybidings are done only on loading `org-remark'
+  (with-eval-after-load 'org-remark
+    (define-key org-remark-mode-map (kbd "C-c n o") #'org-remark-open)
+    (define-key org-remark-mode-map (kbd "C-c n ]") #'org-remark-view-next)
+    (define-key org-remark-mode-map (kbd "C-c n [") #'org-remark-view-prev)
+    (define-key org-remark-mode-map (kbd "C-c n r") #'org-remark-remove)
+    (define-key org-remark-mode-map (kbd "C-c n x") #'org-remark-delete)
+    (define-key org-remark-mode-map (kbd "C-c n t") #'org-remark-toggle)
+    (define-key org-remark-mode-map (kbd "C-c n 0") #'org-remark-mark-yellow) ; yellow box (default pen)
+    (define-key org-remark-mode-map (kbd "C-c n 1") #'org-remark-mark-red-line) ; red box (default pen)
+    (define-key org-remark-mode-map (kbd "C-c n 2") #'org-remark-mark-highlight-b) ; #1e90ff box
+    (define-key org-remark-mode-map (kbd "C-c n 3") #'org-remark-mark-highlight-g) ; #00cd00 box
+    (define-key org-remark-mode-map (kbd "C-c n 4") #'org-remark-mark-highlight-r) ; #b22222 box
+    (define-key org-remark-mode-map (kbd "C-c n 5") #'org-remark-mark-highlight-y) ; #cd661d box
+    )
+
+  ;; Set up custom pens.
+  (org-remark-create "highlight-y"
+                     '(:box (:color "#cd661d" :style solid) :background "#000000")
+                     '(CATEGORY "takenote" help-echo "NB"))
+  (org-remark-create "highlight-r"
+                     '(:box (:color "#b22222"  :style solid) :background "#000000")
+                     '(CATEGORY "idea" help-echo "Idea/Claim/Statement"))
+  (org-remark-create "highlight-b"
+                     '(:box (:color "#1e90ff"  :style solid) :background "#000000")
+                     '(CATEGORY "connection" help-echo "Connection..."))
+  (org-remark-create "highlight-g"
+                     '(:box (:color "#00cd00"  :style solid) :background "#000000")
+                     '(CATEGORY "argument-proof" help-echo "Argument/Proof/Conclusioon"))
+  ;; Override default pens.
+  (org-remark-create "yellow"
+                     '(:box "gold" :background "#000000")
+                     '(CATEGORY "important"))
+  (org-remark-create "red-line"
+                     '(:box (:color "red" :style solid) :background "#000000")
+                     '(CATEGORY "review" help-echo "Review this")))
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -774,6 +834,14 @@
   ;; If you use Markdown or plain text files (Org renders links as buttons
   ;; right away)
   (add-hook 'find-file-hook #'denote-link-buttonize-buffer)
+
+  ;; Fontify specified denote directories in dired.
+  (setq denote-dired-directories
+        (list denote-directory
+              ;(thread-last denote-directory (expand-file-name "attachments"))
+              (expand-file-name "~/denote")))
+
+  (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
 
   ;; Specify an org-capture template for a standard Denote note.
   (with-eval-after-load 'org-capture
@@ -862,9 +930,21 @@
       (call-interactively command)))
 
   ;; Denote menu
-  ;;
+  ;; Loaded from cloned Git repository.
   (add-to-list 'load-path "/Users/drew/gitrepos/denote-menu/")
   (require 'denote-menu)
+
+  (add-to-list 'load-path "~/projects/denote-menu/")
+
+  (setq denote-menu-title-column-width 40)
+
+  (global-set-key (kbd "C-c z") #'list-denotes)
+
+  (define-key denote-menu-mode-map (kbd "c") #'denote-menu-clear-filters)
+  (define-key denote-menu-mode-map (kbd "/ r") #'denote-menu-filter)
+  (define-key denote-menu-mode-map (kbd "/ k") #'denote-menu-filter-by-keyword)
+  (define-key denote-menu-mode-map (kbd "e") #'denote-menu-export-to-dired)
+
 
   ;; Add a text to bibliography using an org-template:
   ;; 1. Find interesting paper online
@@ -1009,6 +1089,9 @@
       (propertize "Wk"
                   'font-lock-face 'font-lock-keyword-face))
 
+(add-hook 'calendar-today-visible-hook 'calendar-mark-today)
+(custom-theme-set-faces 'user '(calendar-today ((t :background "red"))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 100 Shells
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1102,7 +1185,170 @@
          (prog-mode . git-gutter-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; 130 Utility functions
+;; 130 Sagemath
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Use sage-shell-mode
+(use-package sage-shell-mode
+  :ensure t
+  ; :init
+  ;; (custom-set-variables
+  ;;  '(sage-shell:use-prompt-toolkit nil)
+	;;  '(sage-shell:use-simple-prompt t)
+	;;  '(sage-shell:set-ipython-version-on-startup nil)
+	;;  '(sage-shell:check-ipython-version-on-startup nil))
+  :custom
+  (sage-shell:use-prompt-toolkit #'nil)
+	(sage-shell:use-simple-prompt #'t)
+	(sage-shell:set-ipython-version-on-startup #'nil)
+	(sage-shell:check-ipython-version-on-startup #'nil)
+  :config
+  ;; Run SageMath by M-x run-sage instead of M-x sage-shell:run-sage
+  (sage-shell:define-alias)
+
+  ;; Turn on eldoc-mode in Sage terminal and in Sage source files
+  (add-hook 'sage-shell-mode-hook #'eldoc-mode)
+  (add-hook 'sage-shell:sage-mode-hook #'eldoc-mode))
+
+(use-package ob-sagemath
+  :ensure t
+  :config
+  ;; Ob-sagemath supports only evaluating with a session.
+  (setq org-babel-default-header-args:sage '((:session . t)
+                                             (:results . "output")))
+
+  ;; C-c c for asynchronous evaluating (only for SageMath code blocks).
+  (with-eval-after-load "org"
+    (define-key org-mode-map (kbd "C-c c") 'ob-sagemath-execute-async))
+
+  ;; Do not confirm before evaluation
+  (setq org-confirm-babel-evaluate nil)
+
+  ;; Do not evaluate code blocks when exporting.
+  (setq org-export-babel-evaluate nil)
+
+  ;; Show images when opening a file.
+  (setq org-startup-with-inline-images t)
+
+  ;; Show images after evaluating code blocks.
+  (add-hook 'org-babel-after-execute-hook 'org-display-inline-images))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 150 EWW setup (Emacs web browser)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; EWW -- with the navigational comfort and control you get when proficient in
+;; emacs, eww is a powerful addition to a VERY powerful research and
+;; programming work shop.
+
+(with-eval-after-load 'eww
+
+(setq-local endless/display-images t)
+
+(defun endless/toggle-image-display ()
+  "Toggle images display on current buffer."
+  (interactive)
+  (setq endless/display-images
+        (null endless/display-images))
+  (endless/backup-display-property endless/display-images))
+
+(defun endless/backup-display-property (invert &optional object)
+  "Move the 'display property at POS to 'display-backup.
+Only applies if display property is an image.
+If INVERT is non-nil, move from 'display-backup to 'display
+instead.
+Optional OBJECT specifies the string or buffer. Nil means current
+buffer."
+  (let* ((inhibit-read-only t)
+         (from (if invert 'display-backup 'display))
+         (to (if invert 'display 'display-backup))
+         (pos (point-min))
+         left prop)
+    (while (and pos (/= pos (point-max)))
+      (if (get-text-property pos from object)
+          (setq left pos)
+        (setq left (next-single-property-change pos from object)))
+      (if (or (null left) (= left (point-max)))
+          (setq pos nil)
+        (setq prop (get-text-property left from object))
+        (setq pos (or (next-single-property-change left from object)
+                      (point-max)))
+        (when (eq (car prop) 'image)
+          (add-text-properties left pos (list from nil to prop) object))))))
+
+
+(defun my/eww-toggle-images ()
+  "Toggle whether images are loaded and reload the current page fro cache."
+  (interactive)
+  (setq-local shr-inhibit-images (not shr-inhibit-images))
+  (eww-reload t)
+  (message "Images are now %s"
+           (if shr-inhibit-images "off" "on")))
+
+(define-key eww-mode-map (kbd "I") #'my/eww-toggle-images)
+(define-key eww-link-keymap (kbd "I") #'my/eww-toggle-images)
+
+;; minimal rendering by default
+(setq-default shr-inhibit-images t)   ; toggle with `I`
+(setq-default shr-use-fonts nil)      ; toggle with `F`
+
+);end with eveal after load eww
+
+;; Put eww functions/keys in a hydra.
+(use-package pretty-hydra
+  :ensure t
+  :config
+  (setq eww-title '(with-favicon "globe" "Eww Browser Command"))
+
+  ;; Generate hydra
+  (pretty-hydra-define eww-browser (:title eww-title :quit-key "q" :color pink )
+    ("A"
+     (("G" eww "Eww Open Browser")
+      ("g" eww-reload "Eww Reload")
+      ("6" eww-open-in-new-buffer "Open in new buffer")
+      ("l" eww-back-url "Back Url")
+      ("r" eww-forward-url "Forward Url")
+      ("N" eww-next-url "Next Url")
+      ("P" eww-previous-url "Previous Url")
+      ("u" eww-up-url "Up Url")
+      ("&" eww-browse-with-external-browser "Open in External Browser")
+      ("d" eww-download "Download")
+      ("w" eww-copy-page-url "Copy Url Page")
+      );end theme
+     "B"
+     (("T" endless/toggle-image-display "Toggle Image Display")
+      (">" shr-next-link "Shr Next Link")
+      ("<" shr-previous-link "Shr Previous Link")
+      ("n" scroll-down-command "Scroll Down")
+      ("C" url-cookie-list "Url Cookie List")
+      ("v" eww-view-source "View Source")
+      ("R" eww-readable "Make Readable")
+      ("H" eww-list-histories "List History")
+      ("E" eww-set-character-encoding "Character Encoding")
+      ("s" eww-switch-to-buffer "Switch to Buffer")
+      ("S" eww-list-buffers "List Buffers")
+      );end highlighting
+     "C"
+     (("1" hackernews "Hackernews")
+      ("2" hackernews-button-browse-internal "Hackernews browse link eww (t)")
+      ("3" hackernews-new-stories "Hackernews New Stories")
+      ("5" hackernews-switch-feed "Hackernews Switch Feed")
+      ("6" hackernews-best-stories "Hackernews Best Stories")
+      ("F" eww-toggle-fonts "Toggle Fonts")
+      ("D" eww-toggle-paragraph-direction "Toggle Paragraph Direction")
+      ("c" eww-toggle-colors "Toggle Colors")
+      ("b" eww-add-bookmark "Add Bookmark")
+      ("B" eww-list-bookmarks "List Bookmarks")
+      ("=" eww-next-bookmark "Next Bookmark")
+      ("-" eww-previous-bookmark "Previous Bookmark")
+      ("h" hydra-helm/body "Return To Helm" :color blue )
+      ("<SPC>" nil "Quit" :color pink)
+      );end other
+     );end hydra body
+    );end pretty-hydra-eww
+
+  (bind-key "<C-m> z" 'eww-browser/body))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 150 Utility functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Google queries -- M-x google
 (defun google ()
@@ -1127,9 +1373,4 @@
     (fill-region (region-beginning) (region-end) nil)))
 
 ;; End init.el ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(safe-local-variable-values '((TeX-master . main_document\.tex))))
+
