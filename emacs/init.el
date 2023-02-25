@@ -13,14 +13,16 @@
 ; 15.Feb.2023    Installed and configured sagemath.                          ;
 ;                Configure eww to use a 'pretty hydra'.                      ;
 ;                Installed 0rg-remark for text highlighting.                 ;
-; 16.Feb.2023    Customized org-remak pens and marginalia file.              ;
+; 16.Feb.2023    Customized org-remark pens and marginalia file.             ;
 ;                Minor changes to sagemath config.                           ;
+;                Set up Evil mode.                                           ;
+; 24.Feb.2023    Set up mbsync and mu outside emacs and configured mu4e.     ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 00 Table of contents
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; (occur "^;; [0-9]+")                            
+; (occur "^;; [0-9]+")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 10 Name, email, int file location
@@ -172,6 +174,12 @@
 ;; 40 Global settings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; Evil mode
+(use-package evil
+  :ensure t
+  :init
+  (evil-mode 1))
+
 ;; Define prefixed key bindings.
 (use-package general
   :config
@@ -208,9 +216,14 @@
 ; Ovwerite/replace the active region just by typing text
 (delete-selection-mode 1)
 
+; Use ibuffer
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+
 ; IDO mode
 (setq ido-enable-flex-matching t)
 (setq ido-everywhere t)
+(setq ido-use-url-at-point t)
+(setq ido-create-new-buffer 'always)
 (ido-mode 1)
 
 ; Show tool tips in echo area
@@ -402,7 +415,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; 60  File management (dired)
+;; 60 File management (dired)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package all-the-icons-dired
   :ensure nil
@@ -593,6 +606,15 @@
            "* %? |- (%:description) :BOOKMARK:\n:PROPERTIES:\n:CREATED: %U\n:Source: %:link\n:END:\n%i\n")
           ("s" "Selection from browser" entry (file "/Users/drew/org//inbox/inbox.org")
            "* %? :BOOKMARK:\n%(replace-regexp-in-string \"\n.*\" \"\" \"%i\")\n:PROPERTIES:\n:CREATED: %U\n:Source: %:link\n:END:\n%i\n"))))
+
+;; Auto-tangle
+;; Add the option '#+auto_tangle: t' in the org file front matter.
+(use-package org-auto-tangle
+  :defer t
+  :hook (org-mode . org-auto-tangle-mode)
+  :config
+  (setq org-auto-tangle-default t))
+
 
 ;; Citations
 (use-package ivy-bibtex
@@ -1348,7 +1370,78 @@ buffer."
   (bind-key "<C-m> z" 'eww-browser/body))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; 150 Utility functions
+;; 160 Email--mu4e
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Set up mu4e
+;; mu (including mu4e code) was installed using Homebrew.
+(add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu/mu4e/")
+(require 'mu4e)
+
+;; Load org-mode integration
+(require 'org-mu4e)
+
+;; Refresh mail using isync every 10 minutes
+(setq mu4e-update-interval (* 10 60))
+(setq mu4e-get-mail-command "mbsync -a")
+(setq mu4e-maildir "~/Maildir")
+
+(add-to-list 'mu4e-bookmarks
+             ;; add bookmark for recent messages on the Mu mailing list.
+             '( :name "Mu7Days"
+                :key  ?m
+                :query "list:mu-discuss.googlegroups.com AND date:7d..now"))
+
+;; Use Ivy for mu4e completions (maildir folders, etc)
+(setq mu4e-completing-read-function #'ivy-completing-read)
+
+;; Make sure that moving a message (like to Trash) causes the
+;; message to get a new file name.  This helps to avoid the
+;; dreaded "UID is N beyond highest assigned" error.
+;; See this link for more info: https://stackoverflow.com/a/43461973
+(setq mu4e-change-filenames-when-moving t)
+
+;; Set up mail folders
+(setq
+  mu4e-sent-folder   "/Sent Messages"       ;; folder for sent messages
+  mu4e-drafts-folder "/Drafts"     ;; unfinished messages
+  mu4e-trash-folder  "/Trash"      ;; trashed messages
+  mu4e-refile-folder "/Archive")   ;; saved messages
+
+;; Prevent mu4e from permanently deleting trashed items
+;; This snippet was taken from the following article:
+;; http://cachestocaches.com/2017/3/complete-guide-email-emacs-using-mu-and-/
+(defun remove-nth-element (nth list)
+  (if (zerop nth) (cdr list)
+    (let ((last (nthcdr (1- nth) list)))
+      (setcdr last (cddr last))
+      list)))
+
+(setq mu4e-marks (remove-nth-element 5 mu4e-marks))
+(add-to-list 'mu4e-marks
+             '(trash
+               :char ("d" . "▼")
+               :prompt "dtrash"
+               :dyn-target (lambda (target msg) (mu4e-get-trash-folder msg))
+               :action (lambda (docid msg target)
+                         (mu4e~proc-move docid
+                                         (mu4e~mark-check-target target) "-N"))))
+
+;; Display options
+(setq mu4e-view-show-images t)
+(setq mu4e-view-show-addresses 't)
+
+;; Composing mail
+(setq mu4e-compose-dont-reply-to-self t)
+
+;; Use mu4e for sending e-mail
+(setq mail-user-agent 'mu4e-user-agent
+      message-send-mail-function 'smtpmail-send-it
+      smtpmail-smtp-server "mail.drewhodge.org"
+      smtpmail-smtp-service 465
+      smtpmail-stream-type  'ssl)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 170 Utility functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Google queries -- M-x google
 (defun google ()
