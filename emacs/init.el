@@ -17,6 +17,7 @@
 ;                Minor changes to sagemath config.                           ;
 ;                Set up Evil mode.                                           ;
 ; 24.Feb.2023    Set up mbsync and mu outside emacs and configured mu4e.     ;
+; 06.Mar.2023    Installed binder mode (similar to Scrivenor).               ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -178,7 +179,19 @@
 (use-package evil
   :ensure t
   :init
+  (setq evil-want-integration t) ; Optional, already set to t by default.
+  (setq evil-want-keybinding nil)
+  :config
   (evil-mode 1))
+
+(use-package evil-collection
+  :after evil
+  :ensure t
+  :config
+  ;; Register modes individually, as a list passed to evil-collection-init.
+  ;; (evil-collection-init '(calendar dired calc ediff))
+  ;; Register modes all at once.
+  (evil-collection-init))
 
 ;; Define prefixed key bindings.
 (use-package general
@@ -507,6 +520,8 @@
 
   (setq org-outline-path-complete-in-steps nil)
   (setq org-refile-use-outline-path t)
+  ;; Prevent inadvertent edits of an invisible part of an org-mode buffer.
+  (setq org-fold-catch-invisible-edits t)
 
   (org-babel-do-load-languages
    'org-babel-load-languages
@@ -1094,6 +1109,18 @@
     (interactive)
     (namilus-denote-generate-bibliography (dired-get-marked-files nil nil nil t)
                                           (namilus-denote-bibliography-file-prompt))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 85 Binder
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Binder is global minor mode to facilitate working on a writing project in
+;; multiple files. It is heavily inspired by the binder feature in the macOS
+;; writing app Scrivener.
+(use-package binder
+  :ensure t
+  :config
+  (require 'binder-tutorial))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
