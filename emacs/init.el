@@ -18,6 +18,7 @@
 ;                Set up Evil mode.                                           ;
 ; 24.Feb.2023    Set up mbsync and mu outside emacs and configured mu4e.     ;
 ; 06.Mar.2023    Installed binder mode (similar to Scrivenor).               ;
+; 04.Jun.2023    Installed and set up citar and citar-denote packages.       ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -472,7 +473,7 @@
   (dired-rainbow-define-chmod executable-unix "#38c172" "-.*x.*"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; 70 Writing (org, org-ref, Markdown, Pandoc, bibtex, PDF, LaTeX,
+;; 70 Writing (org, org-ref, Markdown, Pandoc, bibtex, citar, PDF, LaTeX,
 ;;             org-static-blog)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Note org-mode and auctex have beenm installed using 'list-packages'.
@@ -650,6 +651,15 @@
         bibtex-completion-pdf-open-function
         (lambda (fpath)
           (call-process "open" nil 0 nil fpath))))
+
+;; Citation management
+(use-package citar
+  :ensure t
+  :custom
+  (citar-bibliography '("~/biblio/core.lib.bib"))
+  :hook
+  (LaTeX-mode . citar-capf-setup)
+  (org-mode . citar-capf-setuo))
 
 (use-package org-ref
   :ensure t
@@ -1110,6 +1120,26 @@
     (namilus-denote-generate-bibliography (dired-get-marked-files nil nil nil t)
                                           (namilus-denote-bibliography-file-prompt))))
 
+(use-package citar-denote
+  :ensure t
+  :config
+  (require 'citar-denote)
+  (citar-denote-mode)
+
+  ;; Key bindings
+  ;(let ((map global-map))
+  ;  (define-key map (kbd "C-c n c c") #'citar-create-note)
+  ;  (define-key map (kbd "C-c n c o") #'citar-denote-open-note)
+  ;  (define-key map (kbd "C-c n c d") #'citar-denote-dwim)
+  ;  (define-key map (kbd "C-c n c a") #'citar-denote-add-citekey)
+  ;  (define-key map (kbd "C-c n c k") #'citar-denote-remove-citekey)
+  ;  (define-key map (kbd "C-c n c e") #'citar-denote-open-reference-entry)
+  ;  (define-key map (kbd "C-c n c r") #'citar-denote-find-reference)
+  ;  (define-key map (kbd "C-c n c f") #'citar-denote-find-citation)
+  ;  (define-key map (kbd "C-c n c n") #'citar-denote-cite-nocite)
+  ;  (define-key map (kbd "C-c n c m") #'citar-denote-reference-nocite))
+)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 85 Binder
@@ -1401,71 +1431,71 @@ buffer."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Set up mu4e
 ;; mu (including mu4e code) was installed using Homebrew.
-(add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu/mu4e/")
-(require 'mu4e)
+;(add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu/mu4e/")
+;(require 'mu4e)
 
 ;; Load org-mode integration
-(require 'org-mu4e)
+;(require 'org-mu4e)
 
 ;; Refresh mail using isync every 10 minutes
-(setq mu4e-update-interval (* 10 60))
-(setq mu4e-get-mail-command "mbsync -a")
-(setq mu4e-maildir "~/Maildir")
+;(setq mu4e-update-interval (* 10 60))
+;(setq mu4e-get-mail-command "mbsync -a")
+;(setq mu4e-maildir "~/Maildir")
 
-(add-to-list 'mu4e-bookmarks
+;(add-to-list 'mu4e-bookmarks
              ;; add bookmark for recent messages on the Mu mailing list.
-             '( :name "Mu7Days"
-                :key  ?m
-                :query "list:mu-discuss.googlegroups.com AND date:7d..now"))
+ ;            '( :name "Mu7Days"
+ ;               :key  ?m
+ ;               :query "list:mu-discuss.googlegroups.com AND date:7d..now"))
 
 ;; Use Ivy for mu4e completions (maildir folders, etc)
-(setq mu4e-completing-read-function #'ivy-completing-read)
+;(setq mu4e-completing-read-function #'ivy-completing-read)
 
 ;; Make sure that moving a message (like to Trash) causes the
 ;; message to get a new file name.  This helps to avoid the
 ;; dreaded "UID is N beyond highest assigned" error.
 ;; See this link for more info: https://stackoverflow.com/a/43461973
-(setq mu4e-change-filenames-when-moving t)
+;(setq mu4e-change-filenames-when-moving t)
 
 ;; Set up mail folders
-(setq
-  mu4e-sent-folder   "/Sent Messages"       ;; folder for sent messages
-  mu4e-drafts-folder "/Drafts"     ;; unfinished messages
-  mu4e-trash-folder  "/Trash"      ;; trashed messages
-  mu4e-refile-folder "/Archive")   ;; saved messages
+;(setq
+;  mu4e-sent-folder   "/Sent Messages"       ;; folder for sent messages
+;  mu4e-drafts-folder "/Drafts"     ;; unfinished messages
+;  mu4e-trash-folder  "/Trash"      ;; trashed messages
+;  mu4e-refile-folder "/Archive")   ;; saved messages
 
 ;; Prevent mu4e from permanently deleting trashed items
 ;; This snippet was taken from the following article:
 ;; http://cachestocaches.com/2017/3/complete-guide-email-emacs-using-mu-and-/
-(defun remove-nth-element (nth list)
-  (if (zerop nth) (cdr list)
-    (let ((last (nthcdr (1- nth) list)))
-      (setcdr last (cddr last))
-      list)))
+;(defun remove-nth-element (nth list)
+;  (if (zerop nth) (cdr list)
+;    (let ((last (nthcdr (1- nth) list)))
+;      (setcdr last (cddr last))
+;      list)))
 
-(setq mu4e-marks (remove-nth-element 5 mu4e-marks))
-(add-to-list 'mu4e-marks
-             '(trash
-               :char ("d" . "▼")
-               :prompt "dtrash"
-               :dyn-target (lambda (target msg) (mu4e-get-trash-folder msg))
-               :action (lambda (docid msg target)
-                         (mu4e~proc-move docid
-                                         (mu4e~mark-check-target target) "-N"))))
+;(setq mu4e-marks (remove-nth-element 5 mu4e-marks))
+;(add-to-list 'mu4e-marks
+;             '(trash
+;               :char ("d" . "▼")
+;               :prompt "dtrash"
+;               :dyn-target (lambda (target msg) (mu4e-get-trash-folder msg))
+;               :action (lambda (docid msg target)
+;                         (mu4e~proc-move docid
+;                                         (mu4e~mark-check-target target) "-N"))))
 
 ;; Display options
-(setq mu4e-view-show-images t)
-(setq mu4e-view-show-addresses 't)
+;(setq mu4e-view-show-images t)
+;(setq mu4e-view-show-addresses 't)
 
 ;; Composing mail
-(setq mu4e-compose-dont-reply-to-self t)
+;(setq mu4e-compose-dont-reply-to-self t)
 
 ;; Use mu4e for sending e-mail
-(setq mail-user-agent 'mu4e-user-agent
-      message-send-mail-function 'smtpmail-send-it
-      smtpmail-smtp-server "mail.drewhodge.org"
-      smtpmail-smtp-service 465
-      smtpmail-stream-type  'ssl)
+;(setq mail-user-agent 'mu4e-user-agent
+;      message-send-mail-function 'smtpmail-send-it
+;      smtpmail-smtp-server "mail.drewhodge.org"
+;      smtpmail-smtp-service 465
+;      smtpmail-stream-type  'ssl)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 170 Utility functions
