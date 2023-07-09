@@ -19,6 +19,8 @@
 ; 24.Feb.2023    Set up mbsync and mu outside emacs and configured mu4e.     ;
 ; 06.Mar.2023    Installed binder mode (similar to Scrivenor).               ;
 ; 04.Jun.2023    Installed and set up citar and citar-denote packages.       ;
+; 04.Jul.2023    Minor addition to org config to 'fontify' src blocks.       ;
+; 07.Jul.2023    Minor changes to citar-denote config.                       ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -306,6 +308,9 @@
 ;; Put backup files in ~/.trash.
 (setq backup-directory-alist '((".*" . "~/.Trash")))
 
+;; Debug on error
+(setq debug-on-error t)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 50 Navigation (Ivy, Counsel, Swiper)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -513,8 +518,7 @@
   (setq org-modules
         '(org-crypt
           org-habit
-          org-bookmark
-          org-eshell))
+          org-bookmark))
 
   (setq org-refile-targets '((nil :maxlevel . 1)
                              (org-agenda-files :maxlevel . 1)))
@@ -527,6 +531,11 @@
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((emacs-lisp . t)))
+
+  ;; Fontify code in code blocks
+  (setq org-src-fontify-natively t
+    org-src-preserve-indentation t
+    org-src-tab-acts-natively t)
 
   ;; Easy edit of Org documents when org-hide-emphasis-markers is turned on.
   (use-package org-appear
@@ -644,22 +653,28 @@
 	      bibtex-completion-additional-search-fields '(keywords)
 	      bibtex-completion-display-formats
         '((article       . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${journal:40}")
-          (inbook        . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} Chapter ${chapter:32}")
+aumann1982grades          (inbook        . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} Chapter ${chapter:32}")
           (incollection  . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
 	        (inproceedings . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
 	        (t             . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*}"))
         bibtex-completion-pdf-open-function
         (lambda (fpath)
-          (call-process "open" nil 0 nil fpath))))
+          (call-process "open" nil 0 nil fpath)))
+
+  ;; Change the bibtex-dialect variable to ’biblatex’.
+  (setq bibtex-dialect 'biblatex))
 
 ;; Citation management
 (use-package citar
   :ensure t
   :custom
   (citar-bibliography '("~/biblio/core.lib.bib"))
-  :hook
-  (LaTeX-mode . citar-capf-setup)
-  (org-mode . citar-capf-setuo))
+  (setq citar-templates
+      '((main . "${author editor:30%sn}     ${date year issued:4}     ${title:48}")
+        (suffix . "          ${=key= id:15}    ${=type=:12}    ${tags keywords:*}")
+        (preview . "${author editor:%etal} (${year issued date}) ${title}, ${journal journaltitle publisher container-title collection-title}.\n")
+        (note . "Notes on ${author editor:%etal}, ${title}"))))
+
 
 (use-package org-ref
   :ensure t
@@ -1127,19 +1142,18 @@
   (citar-denote-mode)
 
   ;; Key bindings
-  ;(let ((map global-map))
-  ;  (define-key map (kbd "C-c n c c") #'citar-create-note)
-  ;  (define-key map (kbd "C-c n c o") #'citar-denote-open-note)
-  ;  (define-key map (kbd "C-c n c d") #'citar-denote-dwim)
-  ;  (define-key map (kbd "C-c n c a") #'citar-denote-add-citekey)
-  ;  (define-key map (kbd "C-c n c k") #'citar-denote-remove-citekey)
-  ;  (define-key map (kbd "C-c n c e") #'citar-denote-open-reference-entry)
-  ;  (define-key map (kbd "C-c n c r") #'citar-denote-find-reference)
-  ;  (define-key map (kbd "C-c n c f") #'citar-denote-find-citation)
-  ;  (define-key map (kbd "C-c n c n") #'citar-denote-cite-nocite)
-  ;  (define-key map (kbd "C-c n c m") #'citar-denote-reference-nocite))
+  (let ((map global-map))
+    (define-key map (kbd "C-c n c c") #'citar-create-note)
+    (define-key map (kbd "C-c n c o") #'citar-denote-open-note)
+    (define-key map (kbd "C-c n c d") #'citar-denote-dwim)
+    (define-key map (kbd "C-c n c a") #'citar-denote-add-citekey)
+    (define-key map (kbd "C-c n c k") #'citar-denote-remove-citekey)
+    (define-key map (kbd "C-c n c e") #'citar-denote-open-reference-entry)
+    (define-key map (kbd "C-c n c r") #'citar-denote-find-reference)
+    (define-key map (kbd "C-c n c f") #'citar-denote-find-citation)
+    (define-key map (kbd "C-c n c n") #'citar-denote-cite-nocite)
+    (define-key map (kbd "C-c n c m") #'citar-denote-reference-nocite))
 )
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 85 Binder
@@ -1518,9 +1532,8 @@ buffer."
     (fill-paragraph nil)))
 
 (defun unfill-region ()
-  (interactive)
+i  (interactive)
   (let ((fill-column (point-max)))
     (fill-region (region-beginning) (region-end) nil)))
 
 ;; End init.el ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
