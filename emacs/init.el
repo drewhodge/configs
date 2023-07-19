@@ -21,7 +21,13 @@
 ; 04.Jun.2023    Installed and set up citar and citar-denote packages.       ;
 ; 04.Jul.2023    Minor addition to org config to 'fontify' src blocks.       ;
 ; 07.Jul.2023    Minor changes to citar-denote config.                       ;
+; 18.Jul.2023    Disabled Doom, modus, and ef themes. Configured pure Emacs  ;
+;                Gruvbox theme.                                              ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;Temporary fix for invalid image type issue, until Emacs 29.x is released.
+;; See: https://emacs.stackexchange.com/questions/74289/emacs-28-2-error-in-macos-ventura-image-type-invalid-image-type-svg/77169#77169
+(setq image-types (cons 'svg image-types))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 00 Table of contents
@@ -34,7 +40,7 @@
 
 (setq user-full-name "Drew Hodge"
       user-mail-address "drew@drewhodge.org")
-                                  
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 20 Package management
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -59,7 +65,7 @@
 (setq use-package-always-ensure t)
 
 ; Bootstrap straight.el
-(defvar bootstrap-version)                        
+(defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
       (bootstrap-version 6))
@@ -100,23 +106,138 @@
 ; Use spaces instead of tabs.
 (setq-default indent-tabs-mode nil)
 
-(use-package doom-themes
+;; Themes
+;;Grubox theme
+(require 'gruvbox-theme)
+;; Load the theme of choice:
+;(load-theme 'gruvbox-dark-soft :no-confirm)
+(load-theme 'gruvbox-dark-medium :no-confirm)
+;(load-theme 'gruvbox-dark-hard :no-confirm)
+
+;; Doom themes
+;; (use-package doom-themes
+;;   :ensure t
+;;   :config
+;;   ;; Global settings (defaults)
+;;   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+;;         doom-themes-enable-italic t) ; if nil, italics is universally disabled
+;;   (load-theme 'doom-gruvbox t))
+
+;;   ;; ;; Enable flashing mode-line on errors
+;;   ;; (doom-themes-visual-bell-config)
+;;   ;; ;; Enable custom neotree theme (all-the-icons must be installed!)
+;;   ;; (doom-themes-neotree-config)
+;;   ;; ;; or for treemacs
+;;   ;; (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
+;;   ;; (doom-themes-treemacs-config)
+;;   ;; ;; Corrects (and improves) org-mode's native fontification.
+;;   ;; (doom-themes-org-config))
+
+;; ;; Ef-themes
+;; ;; Make customisations that affect Emacs faces BEFORE loading a theme
+;; ;; (any change needs a theme re-load to take effect).
+;; (require 'ef-themes)
+
+;; ;; If you like two specific themes and want to switch between them, you
+;; ;; can specify them in `ef-themes-to-toggle' and then invoke the command
+;; ;; `ef-themes-toggle'.  All the themes are included in the variable
+;; ;; `ef-themes-collection'.
+;; (setq ef-themes-to-toggle '(ef-elea-dark ef-light))
+
+;; (setq ef-themes-headings ; read the manual's entry or the doc string
+;;       '((0 fixed-pitch regular 1.2)
+;;         (1 fixed-pitch regular 1.2)
+;;         (2 fixed-pitch regular 1.2)
+;;         (3 fixed-pitch regular 1.2)
+;;         (4 fixed-pitch regular 1.2)
+;;         (5 fixed-pitch regular 1.2)
+;;         (6 fixed-pitch regular 1.2)
+;;         (7 fixed-pitch regular 1.2)
+;;         (t fixed-pitch regular 1.2)))
+
+;; ;; (setq ef-themes-headings ; read the manual's entry or the doc string
+;; ;;       '((0 variable-pitch light 1.9)
+;; ;;         (1 variable-pitch light 1.8)
+;; ;;         (2 variable-pitch regular 1.7)
+;; ;;         (3 variable-pitch regular 1.6)
+;; ;;         (4 variable-pitch regular 1.5)
+;; ;;         (5 variable-pitch 1.4) ; absence of weight means `bold'
+;; ;;         (6 variable-pitch 1.3)
+;; ;;         (7 variable-pitch 1.2)
+;; ;;         (t variable-pitch 1.1)))
+
+;; ;; They are nil by default...
+;; (setq ef-themes-mixed-fonts nil
+;;       ef-themes-variable-pitch-ui nil)
+
+;; ;; Read the doc string or manual for this one.  The symbols can be
+;; ;; combined in any order.
+;; (setq ef-themes-region '(intense no-extend neutral))
+
+;; ;; Disable all other themes to avoid awkward blending:
+;; (mapc #'disable-theme custom-enabled-themes)
+
+;; ;; Load the theme of choice:
+;; (load-theme 'ef-autumn :no-confirm)
+
+;; ;; OR use this to load the theme which also calls `ef-themes-post-load-hook':
+;; (ef-themes-select 'ef-autumn)
+
+;; ;; The themes we provide are recorded in the `ef-themes-dark-themes',
+;; ;; `ef-themes-light-themes'.
+
+;; ;; We also provide these commands, but do not assign them to any key:
+;; ;;
+;; ;; - `ef-themes-toggle'
+;; ;; - `ef-themes-select'
+;; ;; - `ef-themes-select-dark'
+;; ;; - `ef-themes-select-light'
+;; ;; - `ef-themes-load-random'
+;; ;; - `ef-themes-preview-colors'
+;; ;; - `ef-themes-preview-colors-current'
+
+;; Modus themes
+;; ;; Load modus-vivendi-tinted theme and conform that it's safe
+;; ;;; For packaged versions which must use `require'.
+;; (require 'modus-themes)
+;; (use-package modus-themes
+;;   :ensure t
+;;   :config
+;;   ;; Add all your customizations prior to loading the themes
+;;   ;(setq modus-themes-italic-constructs t
+;;   ;      modus-themes-bold-constructs nil)
+
+;;   ;; Maybe define some palette overrides, such as by using our presets
+;;   (setq modus-themes-common-palette-overrides
+;;         modus-themes-preset-overrides-faint)
+;;   (setq modus-themes-common-palette-overrides
+;;         modus-themes-preset-overrides-warmer)
+
+;;   (setq modus-themes-region '(bg-only))
+
+;;   (setq modus-themes-completion 'minimal)
+;;   ;(setq modus-themes-completion 'opinionated)
+
+
+;;   ;; Faint yellow comments and a different shade of green for strings
+;;   (setq modus-themes-common-palette-overrides
+;;         '((comment green-faint)
+;;           (string yellow-warmer)))
+
+;;   ;; Disable all other themes to avoid awkward blending:
+;;   (mapc #'disable-theme custom-enabled-themes)
+
+;;   ;; Load the theme of your choice.
+;;   (load-theme 'modus-vivendi t)
+
+;;   (define-key global-map (kbd "<f5>") #'modus-themes-toggle))
+
+
+;; Treemacs icons
+(use-package treemacs-all-the-icons
   :ensure t
   :config
-  ;; Global settings (defaults)
-  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-        doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (load-theme 'doom-gruvbox t)
-
-  ;; Enable flashing mode-line on errors
-  (doom-themes-visual-bell-config)
-  ;; Enable custom neotree theme (all-the-icons must be installed!)
-  (doom-themes-neotree-config)
-  ;; or for treemacs
-  (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
-  (doom-themes-treemacs-config)
-  ;; Corrects (and improves) org-mode's native fontification.
-  (doom-themes-org-config))
+  (treemacs-load-theme "all-the-icons"))
 
 ;; Emacs app
 (when window-system
@@ -126,7 +247,7 @@
   (tool-bar-mode -1))
 
 ;; Typefaces
-;; Set default typeface 
+;; Set default typeface
 (set-face-attribute 'default nil
                     ;; :font "JetBrains Mono"
                     :font "Fira Code"
@@ -172,29 +293,34 @@
 (use-package all-the-icons
   :ensure t)
 
-  
+(use-package all-the-icons-completion
+  :after (marginalia all-the-icons)
+  :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
+  :init
+  (all-the-icons-completion-mode))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 40 Global settings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Evil mode
-(use-package evil
-  :ensure t
-  :init
-  (setq evil-want-integration t) ; Optional, already set to t by default.
-  (setq evil-want-keybinding nil)
-  :config
-  (evil-mode 1))
+;(use-package evil
+;  :ensure t
+;  :init
+;  (setq evil-want-integration t) ; Optional, already set to t by default.
+;  (setq evil-want-keybinding nil)
+;  :config
+;  (evil-mode 1))
 
-(use-package evil-collection
-  :after evil
-  :ensure t
-  :config
-  ;; Register modes individually, as a list passed to evil-collection-init.
-  ;; (evil-collection-init '(calendar dired calc ediff))
-  ;; Register modes all at once.
-  (evil-collection-init))
+;(use-package evil-collection
+;  :after evil
+;  :ensure t
+;  :config
+;  ;; Register modes individually, as a list passed to evil-collection-init.
+;  ;; (evil-collection-init '(calendar dired calc ediff))
+;  ;; Register modes all at once.
+;  (evil-collection-init))
 
 ;; Define prefixed key bindings.
 (use-package general
@@ -440,6 +566,8 @@
   :ensure nil
   :config
   (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
+  (add-hook 'dired-mode-hook 'dired-hide-details-mode)
+  (setq all-the-icons-dired-monochrome nil)
   (when (string= system-type "darwin")
     (setq dired-use-ls-dired nil))
   (setq dired-listing-switches "-la"
@@ -452,30 +580,31 @@
 (use-package diredc
   :ensure t)
 
-;; Identify file types by colour.
-(use-package dired-rainbow
-  :defer 2
-  :config
-  (dired-rainbow-define-chmod directory "#6cb2eb" "d.*")
-  (dired-rainbow-define html "#eb5286" ("css" "less" "sass" "scss" "htm" "html" "jhtm" "mht" "eml" "mustache" "xhtml"))
-  (dired-rainbow-define xml "#f2d024" ("xml" "xsd" "xsl" "xslt" "wsdl" "bib" "json" "msg" "pgn" "rss" "yaml" "yml" "rdata"))
-  (dired-rainbow-define document "#9561e2" ("docm" "doc" "docx" "odb" "odt" "pdb" "pdf" "ps" "rtf" "djvu" "epub" "odp" "ppt" "pptx"))
-  (dired-rainbow-define markdown "#ffed4a" ("org" "etx" "info" "markdown" "md" "mkd" "nfo" "pod" "rst" "tex" "textfile" "txt"))
-  (dired-rainbow-define database "#6574cd" ("xlsx" "xls" "csv" "accdb" "db" "mdb" "sqlite" "nc"))
-  (dired-rainbow-define media "#de751f" ("mp3" "mp4" "mkv" "MP3" "MP4" "avi" "mpeg" "mpg" "flv" "ogg" "mov" "mid" "midi" "wav" "aiff" "flac"))
-  (dired-rainbow-define image "#f66d9b" ("tiff" "tif" "cdr" "gif" "ico" "jpeg" "jpg" "png" "psd" "eps" "svg"))
-  (dired-rainbow-define log "#c17d11" ("log"))
-  (dired-rainbow-define shell "#f6993f" ("awk" "bash" "bat" "sed" "sh" "zsh" "vim"))
-  (dired-rainbow-define interpreted "#38c172" ("py" "ipynb" "rb" "pl" "t" "msql" "mysql" "pgsql" "sql" "r" "clj" "cljs" "scala" "js"))
-  (dired-rainbow-define compiled "#4dc0b5" ("asm" "cl" "lisp" "el" "c" "h" "c++" "h++" "hpp" "hxx" "m" "cc" "cs" "cp" "cpp" "go" "f" "for" "ftn" "f90" "f95" "f03" "f08" "s" "rs" "hi" "hs" "pyc" ".java"))
-  (dired-rainbow-define executable "#8cc4ff" ("exe" "msi"))
-  (dired-rainbow-define compressed "#51d88a" ("7z" "zip" "bz2" "tgz" "txz" "gz" "xz" "z" "Z" "jar" "war" "ear" "rar" "sar" "xpi" "apk" "xz" "tar"))
-  (dired-rainbow-define packaged "#faad63" ("deb" "rpm" "apk" "jad" "jar" "cab" "pak" "pk3" "vdf" "vpk" "bsp"))
-  (dired-rainbow-define encrypted "#ffed4a" ("gpg" "pgp" "asc" "bfe" "enc" "signature" "sig" "p12" "pem"))
-  (dired-rainbow-define fonts "#6cb2eb" ("afm" "fon" "fnt" "pfb" "pfm" "ttf" "otf"))
-  (dired-rainbow-define partition "#e3342f" ("dmg" "iso" "bin" "nrg" "qcow" "toast" "vcd" "vmdk" "bak"))
-  (dired-rainbow-define vc "#0074d9" ("git" "gitignore" "gitattributes" "gitmodules"))
-  (dired-rainbow-define-chmod executable-unix "#38c172" "-.*x.*"))
+;; ;; Identify file types by colour.
+;; (use-package dired-rainbow
+;;   :config
+;;   (progn
+;;     (dired-rainbow-define-chmod directory "#6cb2eb" "d.*")
+;;     (dired-rainbow-define html "#eb5286" ("css" "less" "sass" "scss" "htm" "html" "jhtm" "mht" "eml" "mustache" "xhtml"))
+;;     (dired-rainbow-define xml "#f2d024" ("xml" "xsd" "xsl" "xslt" "wsdl" "bib" "json" "msg" "pgn" "rss" "yaml" "yml" "rdata"))
+;;     (dired-rainbow-define document "#9561e2" ("docm" "doc" "docx" "odb" "odt" "pdb" "pdf" "ps" "rtf" "djvu" "epub" "odp" "ppt" "pptx"))
+;;     (dired-rainbow-define markdown "#ffed4a" ("org" "etx" "info" "markdown" "md" "mkd" "nfo" "pod" "rst" "tex" "textfile" "txt"))
+;;     (dired-rainbow-define database "#6574cd" ("xlsx" "xls" "csv" "accdb" "db" "mdb" "sqlite" "nc"))
+;;     (dired-rainbow-define media "#de751f" ("mp3" "mp4" "MP3" "MP4" "avi" "mpeg" "mpg" "flv" "ogg" "mov" "mid" "midi" "wav" "aiff" "flac"))
+;;     (dired-rainbow-define image "#f66d9b" ("tiff" "tif" "cdr" "gif" "ico" "jpeg" "jpg" "png" "psd" "eps" "svg"))
+;;     (dired-rainbow-define log "#c17d11" ("log"))
+;;     (dired-rainbow-define shell "#f6993f" ("awk" "bash" "bat" "sed" "sh" "zsh" "vim"))
+;;     (dired-rainbow-define interpreted "#38c172" ("py" "ipynb" "rb" "pl" "t" "msql" "mysql" "pgsql" "sql" "r" "clj" "cljs" "scala" "js"))
+;;     (dired-rainbow-define compiled "#4dc0b5" ("asm" "cl" "lisp" "el" "c" "h" "c++" "h++" "hpp" "hxx" "m" "cc" "cs" "cp" "cpp" "go" "f" "for" "ftn" "f90" "f95" "f03" "f08" "s" "rs" "hi" "hs" "pyc" ".java"))
+;;     (dired-rainbow-define executable "#8cc4ff" ("exe" "msi"))
+;;     (dired-rainbow-define compressed "#51d88a" ("7z" "zip" "bz2" "tgz" "txz" "gz" "xz" "z" "Z" "jar" "war" "ear" "rar" "sar" "xpi" "apk" "xz" "tar"))
+;;     (dired-rainbow-define packaged "#faad63" ("deb" "rpm" "apk" "jad" "jar" "cab" "pak" "pk3" "vdf" "vpk" "bsp"))
+;;     (dired-rainbow-define encrypted "#ffed4a" ("gpg" "pgp" "asc" "bfe" "enc" "signature" "sig" "p12" "pem"))
+;;     (dired-rainbow-define fonts "#6cb2eb" ("afm" "fon" "fnt" "pfb" "pfm" "ttf" "otf"))
+;;     (dired-rainbow-define partition "#e3342f" ("dmg" "iso" "bin" "nrg" "qcow" "toast" "vcd" "vmdk" "bak"))
+;;     (dired-rainbow-define vc "#0074d9" ("git" "gitignore" "gitattributes" "gitmodules"))
+;;     (dired-rainbow-define-chmod executable-unix "#38c172" "-.*x.*")
+;;  ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 70 Writing (org, org-ref, Markdown, Pandoc, bibtex, citar, PDF, LaTeX,
@@ -653,7 +782,7 @@
 	      bibtex-completion-additional-search-fields '(keywords)
 	      bibtex-completion-display-formats
         '((article       . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${journal:40}")
-aumann1982grades          (inbook        . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} Chapter ${chapter:32}")
+          (inbook        . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} Chapter ${chapter:32}")
           (incollection  . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
 	        (inproceedings . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
 	        (t             . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*}"))
@@ -853,7 +982,7 @@ aumann1982grades          (inbook        . "${=has-pdf=:1}${=has-note=:1} ${year
 ;; Deft
 (use-package deft
   :commands (deft)
-  :config (setq deft-directory "/Users/drew/org/roam"
+  :config (setq deft-directory "/Users/drew/org/deft"
                 deft-recursive t
                 deft-extensions '("md" "org")))
 
@@ -1441,75 +1570,53 @@ buffer."
   (bind-key "<C-m> z" 'eww-browser/body))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; 160 Email--mu4e
+;; 160 Vertico and Marginalia
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Set up mu4e
-;; mu (including mu4e code) was installed using Homebrew.
-;(add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu/mu4e/")
-;(require 'mu4e)
+;; Enable vertico
+(use-package vertico
+  :ensure t
+  ;; Special recipe to load extensions conveniently
+  :straight (vertico :files (:defaults "extensions/*")
+                     :includes (vertico-indexed
+                                vertico-flat
+                                vertico-grid
+                                vertico-mouse
+                                vertico-quick
+                                vertico-buffer
+                                vertico-repeat
+                                vertico-reverse
+                                vertico-directory
+                                vertico-multiform
+                                vertico-unobtrusive
+                                ))
+  :general
+  (:keymaps 'vertico-map
+   "<tab>" #'vertico-insert    ; Choose selected candidate
+   "<escape>" #'minibuffer-keyboard-quit ; Close minibuffer
+   ;; NOTE 2022-02-05: Cycle through candidate groups
+   "C-M-n" #'vertico-next-group
+   "C-M-p" #'vertico-previous-group)
+  :custom
+  (vertico-count 13)                    ; Number of candidates to display
+  (vertico-resize t)
+  (vertico-cycle nil) ; Go from last to first candidate and first to last (cycle)?
+  :config
+  (vertico-mode))
 
-;; Load org-mode integration
-;(require 'org-mu4e)
 
-;; Refresh mail using isync every 10 minutes
-;(setq mu4e-update-interval (* 10 60))
-;(setq mu4e-get-mail-command "mbsync -a")
-;(setq mu4e-maildir "~/Maildir")
+;; Enable rich annotations using the Marginalia package
+(use-package marginalia
+  :ensure t
+  :general
+  (:keymaps 'minibuffer-local-map
+   "M-A" 'marginalia-cycle)
+  :custom
+  (marginalia-max-relative-age 0)
+  (marginalia-align 'right)
+  :init
+  (marginalia-mode))
 
-;(add-to-list 'mu4e-bookmarks
-             ;; add bookmark for recent messages on the Mu mailing list.
- ;            '( :name "Mu7Days"
- ;               :key  ?m
- ;               :query "list:mu-discuss.googlegroups.com AND date:7d..now"))
 
-;; Use Ivy for mu4e completions (maildir folders, etc)
-;(setq mu4e-completing-read-function #'ivy-completing-read)
-
-;; Make sure that moving a message (like to Trash) causes the
-;; message to get a new file name.  This helps to avoid the
-;; dreaded "UID is N beyond highest assigned" error.
-;; See this link for more info: https://stackoverflow.com/a/43461973
-;(setq mu4e-change-filenames-when-moving t)
-
-;; Set up mail folders
-;(setq
-;  mu4e-sent-folder   "/Sent Messages"       ;; folder for sent messages
-;  mu4e-drafts-folder "/Drafts"     ;; unfinished messages
-;  mu4e-trash-folder  "/Trash"      ;; trashed messages
-;  mu4e-refile-folder "/Archive")   ;; saved messages
-
-;; Prevent mu4e from permanently deleting trashed items
-;; This snippet was taken from the following article:
-;; http://cachestocaches.com/2017/3/complete-guide-email-emacs-using-mu-and-/
-;(defun remove-nth-element (nth list)
-;  (if (zerop nth) (cdr list)
-;    (let ((last (nthcdr (1- nth) list)))
-;      (setcdr last (cddr last))
-;      list)))
-
-;(setq mu4e-marks (remove-nth-element 5 mu4e-marks))
-;(add-to-list 'mu4e-marks
-;             '(trash
-;               :char ("d" . "▼")
-;               :prompt "dtrash"
-;               :dyn-target (lambda (target msg) (mu4e-get-trash-folder msg))
-;               :action (lambda (docid msg target)
-;                         (mu4e~proc-move docid
-;                                         (mu4e~mark-check-target target) "-N"))))
-
-;; Display options
-;(setq mu4e-view-show-images t)
-;(setq mu4e-view-show-addresses 't)
-
-;; Composing mail
-;(setq mu4e-compose-dont-reply-to-self t)
-
-;; Use mu4e for sending e-mail
-;(setq mail-user-agent 'mu4e-user-agent
-;      message-send-mail-function 'smtpmail-send-it
-;      smtpmail-smtp-server "mail.drewhodge.org"
-;      smtpmail-smtp-service 465
-;      smtpmail-stream-type  'ssl)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 170 Utility functions
@@ -1532,7 +1639,7 @@ buffer."
     (fill-paragraph nil)))
 
 (defun unfill-region ()
-i  (interactive)
+  (interactive)
   (let ((fill-column (point-max)))
     (fill-region (region-beginning) (region-end) nil)))
 
