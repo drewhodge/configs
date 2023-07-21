@@ -1,0 +1,109 @@
+/* Custom CSS ................... */
+/* 08.Dec.2021 .................. */
+
+/* YAML front matter*/
+
+
+/* Body rules */
+body #editor .CodeMirror {
+    font-family: Inconsolata, Consolas, Menlo, monospace;
+    
+}
+
+/* Body text */
+body.dark #editor .CodeMirror, body.dark .quicklook .body .CodeMirror, body.dark .dialog .CodeMirror {
+    color: #fbf1c7;
+}
+
+/* Blockquote */
+span.cm-quote.cm-quote-1 {
+  color: #d5c4a1;
+}
+
+/* Foot notes */
+span.cm-link {
+  color: #cc241d;
+}
+
+/* Spelling error */
+body.dark #editor .CodeMirror .cm-spell-error, body.dark .quicklook .body .CodeMirror .cm-spell-error, body.dark .dialog .CodeMirror .cm-spell-error {
+    text-decoration-color: #fabd2f;
+}
+
+body #editor .CodeMirror .cm-spell-error, body .dialog .CodeMirror .cm-spell-error {
+    text-decoration: dotted underline;
+    text-decoration-thickness: 15%; 
+    text-decoration-skip-ink: none;
+}
+
+/* Citations in bibliography section */
+body.dark #editor .CodeMirror .citeproc-citation, body.dark .quicklook .body .CodeMirror .citeproc-citation, body.dark .dialog .CodeMirror .citeproc-citation {
+    background-color: #282828;
+}
+
+/* Document headers */
+.CodeMirror .size-header-1 {
+    font-size: 16pt;
+    color: #458588;
+}
+
+.CodeMirror .size-header-2 {
+    font-size: 14pt;
+    color: #83a598;
+}
+
+.CodeMirror .size-header-3 {
+    font-size: 12pt;
+    color: #83a598;
+}
+
+.CodeMirror .size-header-4 {
+    font-size: 12pt;
+    color: #83a598;
+}
+
+.CodeMirror .size-header-5 {
+    font-size: 12pt;
+    color: #83a598;
+}
+
+.CodeMirror .size-header-6 {
+    font-size: 12pt;
+    color: #83a598;
+}
+
+/* Markdown header code */
+body.dark #editor .CodeMirror .cm-formatting-header-1, body.dark #editor .CodeMirror .cm-formatting-header-2, body.dark #editor .CodeMirror .cm-formatting-header-3, body.dark #editor .CodeMirror .cm-formatting-header-4, body.dark #editor .CodeMirror .cm-formatting-header-5, body.dark #editor .CodeMirror .cm-formatting-header-6, body.dark #editor .CodeMirror .cm-url {
+    color: #5c7f72;
+}
+
+/* Sidebar rules */
+body #sidebar h1 {
+    padding: 10px;
+    font-size: 16px;
+    color: #A0A0A0;
+}
+
+body #sidebar div.toc-entry-container div.toc-entry {
+    flex-grow: 3;
+    cursor: pointer;
+    font-size: 10pt;
+    color: #458588;
+}
+
+body #sidebar div.toc-entry-container div.toc-level {
+    flex-shrink: 1;
+    padding: 0px 5px;
+    font-size: 10pt;
+    font-weight: bold;
+    color: var(--system-accent-color, --c-primary);
+}
+
+/* Comments */
+body.dark #editor .CodeMirror .cm-comment:not(.cm-formatting):not(.cm-fenced-code) {
+    background-color: #14141e;
+    color: green;
+}
+
+
+
