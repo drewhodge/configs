@@ -1,8 +1,9 @@
-theme = "gruvbox_dark_hard"
+theme = "gruvbox_modified"
 
 [editor]
 line-number = "relative"
 mouse = false
+bufferline = "multiple"
 color-modes = true
 text-width = 80
 
@@ -49,6 +50,9 @@ enable = true
 max-wrap = 25 # increase value to reduce forced mid-word wrapping
 max-indent-retain = 0
 wrap-indicator = ""  # set wrap-indicator to "" to hide it
+
+[keys.normal]
+esc = ["collapse_selection", "keep_primary_selection"] # Use ESC for all 'deselect' actions.
 
 
 

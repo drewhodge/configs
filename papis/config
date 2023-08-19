@@ -1,0 +1,36 @@
+[papers]
+dir = ~/biblio/bibtex-pdfs
+
+database-backend = papis
+use-cache = False
+
+
+[settings]
+default-library = papers
+
+# PDF viewer/editor
+opentool = skim
+
+# File manger -- use MC
+file-browser = mc
+
+# Confirm before adding documents
+add-edit = True
+
+# Open document before adding to library
+add-open = True
+
+# Define custom default match and header formats
+match-format = {doc[tags]}{doc.subfolder}{doc[title]}{doc[author]}{doc[year]}
+
+# Define header format with colors and multiline support
+header-format = <red>{doc.html_escape[title]}</red>
+  <span color='#ff00ff'>  {doc.html_escape[author]}</span>
+  <yellow>   ({doc.html_escape[year]})</yellow>
+
+[tui]
+editmode = nvim
+options_list.selected_margin_style = bg:ansigreen fg:ansired
+options_list.unselected_margin_style =
+
+[books]

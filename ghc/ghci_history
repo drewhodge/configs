@@ -1,0 +1,9 @@
+:quit
+:quit
+:type putStrLn
+clearBit 33 0
+shiftL 32 1
+import Data.Bits
+:load hello.hs
+putStrLn "Testing ghci"
+1+1
