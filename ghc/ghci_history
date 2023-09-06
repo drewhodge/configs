@@ -1,3 +1,53 @@
+12 `div` 5
+i `div` i
+7 ^ 222
+19 `mod` 5
+19 `mod` 3
+mod 19 3
+8.7 / 3.1
+2.35 * 8.6
+19 - 27
+3 + 2
+:?
+numDigits
+:r
+:r
+r
+y + 1
+y
+:l ghciScratch.hs
+:l ghciScratch.hs
+biggestInt
+:l ghciScratch.hs
+:l ghicScratch.hs
+:pwd
+:l ghicScratch.hs
+maxInt
+smallestInt
+biggestInt
+biggextInt
+:l cheatsheet.hs
+smallestInt
+minBound
+maxBound
+biggestInt
+:l cheatsheet.hs
+:l cheatsheet.hs
+biggestInt, smallestInt :: Int
+y = y + 1
+let y :: Int
+y :: Int
+morePrimes
+morePrime
+morePrimes
+sumOfVals
+minInt
+maxInt
+:l cheatsheet
+:l cheatsheet
+:l cheatsheet
+q
+clear
 :quit
 :quit
 :type putStrLn

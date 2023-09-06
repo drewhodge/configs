@@ -23,6 +23,8 @@
 ; 07.Jul.2023    Minor changes to citar-denote config.                       ;
 ; 18.Jul.2023    Disabled Doom, modus, and ef themes. Configured pure Emacs  ;
 ;                Gruvbox theme.                                              ;
+; 19.Jul.2023    Modified dired config; removed dired-rainbow and enabled    ;
+;                colour for dired-all-the-icons.                             ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;Temporary fix for invalid image type issue, until Emacs 29.x is released.
@@ -261,14 +263,14 @@
                     :weight 'light
                     :height 130)
 
-;; Modify theme's link face.
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(calendar-today ((t :background "red")))
- '(link ((t (:foreground "#d3869b" :underline t :weight normal)))))
+;; ;; Modify theme's link face.
+;; (custom-set-faces
+;;  ;; custom-set-faces was added by Custom.
+;;  ;; If you edit it by hand, you could mess it up, so be careful.
+;;  ;; Your init file should contain only one such instance.
+;;  ;; If there is more than one, they won't work right.
+;;  '(calendar-today ((t :background "red")))
+;;  '(link ((t (:foreground "#d3869b" :underline t :weight normal)))))
 
 ;; Modeline
 (use-package doom-modeline
@@ -305,22 +307,22 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Evil mode
-;(use-package evil
-;  :ensure t
-;  :init
-;  (setq evil-want-integration t) ; Optional, already set to t by default.
-;  (setq evil-want-keybinding nil)
-;  :config
-;  (evil-mode 1))
+(use-package evil
+ :ensure t
+ :init
+ (setq evil-want-integration t) ; Optional, already set to t by default.
+ (setq evil-want-keybinding nil)
+ :config
+ (evil-mode 1))
 
-;(use-package evil-collection
-;  :after evil
-;  :ensure t
-;  :config
-;  ;; Register modes individually, as a list passed to evil-collection-init.
-;  ;; (evil-collection-init '(calendar dired calc ediff))
-;  ;; Register modes all at once.
-;  (evil-collection-init))
+(use-package evil-collection
+ :after evil
+ :ensure t
+ :config
+ ;; Register modes individually, as a list passed to evil-collection-init.
+ ;; (evil-collection-init '(calendar dired calc ediff))
+ ;; Register modes all at once.
+ (evil-collection-init))
 
 ;; Define prefixed key bindings.
 (use-package general
