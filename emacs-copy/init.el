@@ -30,6 +30,8 @@
 ;                Added vertico, orderless, and marginalia packages.          ;
 ;                Remove 'use-package' command for pandoc and ox-pandoc and   ;
 ;                installed pandoc-related packages with 'package-install'.   ;
+; 07.Sep.2023    Installed Prot's Pulsar mode; pulse-highlights current line.;
+;                Changed typface fonts to Iosevka Comfy.                     ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Temporary fix for invalid image type issue, until Emacs 29.x is released.
@@ -253,13 +255,15 @@
 ;; Typefaces
 ;; Set default typeface
 (set-face-attribute 'default nil
-                    :font "JetBrains Mono"
+                    :font "Iosevka Comfy"
+                    ;:font "JetBrains Mono"
                     :weight 'light
                     :height 130)
 
 ;; Set the fixed pitch face
 (set-face-attribute 'fixed-pitch nil
-                    :font "JetBrains Mono"
+                    :font "Iosevka Comfy"
+                    ;:font "JetBrains Mono"
                     :weight 'light
                     :height 130)
 
@@ -425,6 +429,43 @@
 ;; Stateful keymaps
 (use-package hydra
   :defer 1)
+
+;; Use Prot's Pulsar package
+;; Make Elisp files in that directory available to the user.
+(add-to-list 'load-path "~/gitrepos/emacs-pulsar")
+
+(require 'pulsar)
+
+;; Check the default value of `pulsar-pulse-functions'.  That is where
+;; you add more commands that should cause a pulse after they are
+;; invoked
+
+(setq pulsar-pulse t)
+(setq pulsar-delay 0.055)
+(setq pulsar-iterations 10)
+(setq pulsar-face 'pulsar-yellow)
+(setq pulsar-highlight-face 'pulsar-yellow)
+
+(pulsar-global-mode 1)
+
+;; OR use the local mode for select mode hooks
+
+(dolist (hook '(org-mode-hook emacs-lisp-mode-hook))
+  (add-hook hook #'pulsar-mode))
+
+;; pulsar does not define any key bindings.  This is just a sample that
+;; respects the key binding conventions.  Evaluate:
+;;
+;;     (info "(elisp) Key Binding Conventions")
+;;
+;; The author uses C-x l for `pulsar-pulse-line' and C-x L for
+;; `pulsar-highlight-line'.
+;;
+;; You can replace `pulsar-highlight-line' with the command
+;; `pulsar-highlight-dwim'.
+(let ((map global-map))
+  (define-key map (kbd "C-c h p") #'pulsar-pulse-line)
+  (define-key map (kbd "C-c h h") #'pulsar-highlight-line))
 
 ;; Put backup files in ~/.trash.
 (setq backup-directory-alist '((".*" . "~/.Trash")))
