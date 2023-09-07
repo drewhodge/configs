@@ -19,15 +19,20 @@
 ; 24.Feb.2023    Set up mbsync and mu outside emacs and configured mu4e.     ;
 ; 06.Mar.2023    Installed binder mode (similar to Scrivenor).               ;
 ; 04.Jun.2023    Installed and set up citar and citar-denote packages.       ;
+; 27.Jun.2023    Commented out code for citar and citar-denote--using a      ;
+;                different method for bilibliography management.             :
 ; 04.Jul.2023    Minor addition to org config to 'fontify' src blocks.       ;
 ; 07.Jul.2023    Minor changes to citar-denote config.                       ;
 ; 18.Jul.2023    Disabled Doom, modus, and ef themes. Configured pure Emacs  ;
 ;                Gruvbox theme.                                              ;
-; 19.Jul.2023    Modified dired config; removed dired-rainbow and enabled    ;
+; 19.Jul.2023    Modified dired config; removed dired rainbow and enabled    ;
 ;                colour for dired-all-the-icons.                             ;
+;                Added vertico, orderless, and marginalia packages.          ;
+;                Remove 'use-package' command for pandoc and ox-pandoc and   ;
+;                installed pandoc-related packages with 'package-install'.   ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;Temporary fix for invalid image type issue, until Emacs 29.x is released.
+;; Temporary fix for invalid image type issue, until Emacs 29.x is released.
 ;; See: https://emacs.stackexchange.com/questions/74289/emacs-28-2-error-in-macos-ventura-image-type-invalid-image-type-svg/77169#77169
 (setq image-types (cons 'svg image-types))
 
@@ -42,7 +47,7 @@
 
 (setq user-full-name "Drew Hodge"
       user-mail-address "drew@drewhodge.org")
-
+                                  
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 20 Package management
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -92,7 +97,6 @@
 ;; Add custom emacs lisp libraries to load-path
 (push "~/.dotfiles/.emacs.d/lisp" load-path)
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 30 Appearance
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -116,24 +120,23 @@
 (load-theme 'gruvbox-dark-medium :no-confirm)
 ;(load-theme 'gruvbox-dark-hard :no-confirm)
 
-;; Doom themes
 ;; (use-package doom-themes
 ;;   :ensure t
 ;;   :config
 ;;   ;; Global settings (defaults)
 ;;   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
 ;;         doom-themes-enable-italic t) ; if nil, italics is universally disabled
-;;   (load-theme 'doom-gruvbox t))
+;;   (load-theme 'doom-gruvbox t)
 
-;;   ;; ;; Enable flashing mode-line on errors
-;;   ;; (doom-themes-visual-bell-config)
-;;   ;; ;; Enable custom neotree theme (all-the-icons must be installed!)
-;;   ;; (doom-themes-neotree-config)
-;;   ;; ;; or for treemacs
-;;   ;; (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
-;;   ;; (doom-themes-treemacs-config)
-;;   ;; ;; Corrects (and improves) org-mode's native fontification.
-;;   ;; (doom-themes-org-config))
+;;   ;; Enable flashing mode-line on errors
+;;   (doom-themes-visual-bell-config)
+;;   ;; Enable custom neotree theme (all-the-icons must be installed!)
+;;   (doom-themes-neotree-config)
+;;   ;; or for treemacs
+;;   (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
+;;   (doom-themes-treemacs-config)
+;;   ;; Corrects (and improves) org-mode's native fontification.
+;;   (doom-themes-org-config))
 
 ;; ;; Ef-themes
 ;; ;; Make customisations that affect Emacs faces BEFORE loading a theme
@@ -234,7 +237,6 @@
 
 ;;   (define-key global-map (kbd "<f5>") #'modus-themes-toggle))
 
-
 ;; Treemacs icons
 (use-package treemacs-all-the-icons
   :ensure t
@@ -251,26 +253,24 @@
 ;; Typefaces
 ;; Set default typeface
 (set-face-attribute 'default nil
-                    ;; :font "JetBrains Mono"
-                    :font "Fira Code"
+                    :font "JetBrains Mono"
                     :weight 'light
                     :height 130)
 
 ;; Set the fixed pitch face
 (set-face-attribute 'fixed-pitch nil
-                    ;; :font "JetBrains Mono"
-                    :font "Fira Code"
+                    :font "JetBrains Mono"
                     :weight 'light
                     :height 130)
 
-;; ;; Modify theme's link face.
-;; (custom-set-faces
-;;  ;; custom-set-faces was added by Custom.
-;;  ;; If you edit it by hand, you could mess it up, so be careful.
-;;  ;; Your init file should contain only one such instance.
-;;  ;; If there is more than one, they won't work right.
-;;  '(calendar-today ((t :background "red")))
-;;  '(link ((t (:foreground "#d3869b" :underline t :weight normal)))))
+;; Modify theme's link face.
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(calendar-today ((t :background "red")))
+ '(link ((t (:foreground "#d3869b" :underline t :weight normal)))))
 
 ;; Modeline
 (use-package doom-modeline
@@ -294,13 +294,6 @@
 
 (use-package all-the-icons
   :ensure t)
-
-(use-package all-the-icons-completion
-  :after (marginalia all-the-icons)
-  :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
-  :init
-  (all-the-icons-completion-mode))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 40 Global settings
@@ -436,8 +429,7 @@
 ;; Put backup files in ~/.trash.
 (setq backup-directory-alist '((".*" . "~/.Trash")))
 
-;; Debug on error
-(setq debug-on-error t)
+(setq set-debug-on-error t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 50 Navigation (Ivy, Counsel, Swiper)
@@ -564,11 +556,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 60 File management (dired)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Specific dired settings
+(add-hook 'dired-mode-hook 'dired-hide-details-mode)
+
 (use-package all-the-icons-dired
   :ensure nil
   :config
   (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
-  (add-hook 'dired-mode-hook 'dired-hide-details-mode)
   (setq all-the-icons-dired-monochrome nil)
   (when (string= system-type "darwin")
     (setq dired-use-ls-dired nil))
@@ -578,35 +572,34 @@
         dired-hide-details-hide-symlink-targets nil
         delete-by-moving-to-trash t))
 
-
+;; Enable diredc--an MC-like setup for dired (orthodox file manager, dual pane.)
 (use-package diredc
   :ensure t)
 
-;; ;; Identify file types by colour.
+;; Identify file types by colour.
 ;; (use-package dired-rainbow
+;;   :defer 2
 ;;   :config
-;;   (progn
-;;     (dired-rainbow-define-chmod directory "#6cb2eb" "d.*")
-;;     (dired-rainbow-define html "#eb5286" ("css" "less" "sass" "scss" "htm" "html" "jhtm" "mht" "eml" "mustache" "xhtml"))
-;;     (dired-rainbow-define xml "#f2d024" ("xml" "xsd" "xsl" "xslt" "wsdl" "bib" "json" "msg" "pgn" "rss" "yaml" "yml" "rdata"))
-;;     (dired-rainbow-define document "#9561e2" ("docm" "doc" "docx" "odb" "odt" "pdb" "pdf" "ps" "rtf" "djvu" "epub" "odp" "ppt" "pptx"))
-;;     (dired-rainbow-define markdown "#ffed4a" ("org" "etx" "info" "markdown" "md" "mkd" "nfo" "pod" "rst" "tex" "textfile" "txt"))
-;;     (dired-rainbow-define database "#6574cd" ("xlsx" "xls" "csv" "accdb" "db" "mdb" "sqlite" "nc"))
-;;     (dired-rainbow-define media "#de751f" ("mp3" "mp4" "MP3" "MP4" "avi" "mpeg" "mpg" "flv" "ogg" "mov" "mid" "midi" "wav" "aiff" "flac"))
-;;     (dired-rainbow-define image "#f66d9b" ("tiff" "tif" "cdr" "gif" "ico" "jpeg" "jpg" "png" "psd" "eps" "svg"))
-;;     (dired-rainbow-define log "#c17d11" ("log"))
-;;     (dired-rainbow-define shell "#f6993f" ("awk" "bash" "bat" "sed" "sh" "zsh" "vim"))
-;;     (dired-rainbow-define interpreted "#38c172" ("py" "ipynb" "rb" "pl" "t" "msql" "mysql" "pgsql" "sql" "r" "clj" "cljs" "scala" "js"))
-;;     (dired-rainbow-define compiled "#4dc0b5" ("asm" "cl" "lisp" "el" "c" "h" "c++" "h++" "hpp" "hxx" "m" "cc" "cs" "cp" "cpp" "go" "f" "for" "ftn" "f90" "f95" "f03" "f08" "s" "rs" "hi" "hs" "pyc" ".java"))
-;;     (dired-rainbow-define executable "#8cc4ff" ("exe" "msi"))
-;;     (dired-rainbow-define compressed "#51d88a" ("7z" "zip" "bz2" "tgz" "txz" "gz" "xz" "z" "Z" "jar" "war" "ear" "rar" "sar" "xpi" "apk" "xz" "tar"))
-;;     (dired-rainbow-define packaged "#faad63" ("deb" "rpm" "apk" "jad" "jar" "cab" "pak" "pk3" "vdf" "vpk" "bsp"))
-;;     (dired-rainbow-define encrypted "#ffed4a" ("gpg" "pgp" "asc" "bfe" "enc" "signature" "sig" "p12" "pem"))
-;;     (dired-rainbow-define fonts "#6cb2eb" ("afm" "fon" "fnt" "pfb" "pfm" "ttf" "otf"))
-;;     (dired-rainbow-define partition "#e3342f" ("dmg" "iso" "bin" "nrg" "qcow" "toast" "vcd" "vmdk" "bak"))
-;;     (dired-rainbow-define vc "#0074d9" ("git" "gitignore" "gitattributes" "gitmodules"))
-;;     (dired-rainbow-define-chmod executable-unix "#38c172" "-.*x.*")
-;;  ))
+;;   (dired-rainbow-define-chmod directory "#6cb2eb" "d.*")
+;;   (dired-rainbow-define html "#eb5286" ("css" "less" "sass" "scss" "htm" "html" "jhtm" "mht" "eml" "mustache" "xhtml"))
+;;   (dired-rainbow-define xml "#f2d024" ("xml" "xsd" "xsl" "xslt" "wsdl" "bib" "json" "msg" "pgn" "rss" "yaml" "yml" "rdata"))
+;;   (dired-rainbow-define document "#9561e2" ("docm" "doc" "docx" "odb" "odt" "pdb" "pdf" "ps" "rtf" "djvu" "epub" "odp" "ppt" "pptx"))
+;;   (dired-rainbow-define markdown "#ffed4a" ("org" "etx" "info" "markdown" "md" "mkd" "nfo" "pod" "rst" "tex" "textfile" "txt"))
+;;   (dired-rainbow-define database "#6574cd" ("xlsx" "xls" "csv" "accdb" "db" "mdb" "sqlite" "nc"))
+;;   (dired-rainbow-define media "#de751f" ("mp3" "mp4" "mkv" "MP3" "MP4" "avi" "mpeg" "mpg" "flv" "ogg" "mov" "mid" "midi" "wav" "aiff" "flac"))
+;;   (dired-rainbow-define image "#f66d9b" ("tiff" "tif" "cdr" "gif" "ico" "jpeg" "jpg" "png" "psd" "eps" "svg"))
+;;   (dired-rainbow-define log "#c17d11" ("log"))
+;;   (dired-rainbow-define shell "#f6993f" ("awk" "bash" "bat" "sed" "sh" "zsh" "vim"))
+;;   (dired-rainbow-define interpreted "#38c172" ("py" "ipynb" "rb" "pl" "t" "msql" "mysql" "pgsql" "sql" "r" "clj" "cljs" "scala" "js"))
+;;   (dired-rainbow-define compiled "#4dc0b5" ("asm" "cl" "lisp" "el" "c" "h" "c++" "h++" "hpp" "hxx" "m" "cc" "cs" "cp" "cpp" "go" "f" "for" "ftn" "f90" "f95" "f03" "f08" "s" "rs" "hi" "hs" "pyc" ".java"))
+;;   (dired-rainbow-define executable "#8cc4ff" ("exe" "msi"))
+;;   (dired-rainbow-define compressed "#51d88a" ("7z" "zip" "bz2" "tgz" "txz" "gz" "xz" "z" "Z" "jar" "war" "ear" "rar" "sar" "xpi" "apk" "xz" "tar"))
+;;   (dired-rainbow-define packaged "#faad63" ("deb" "rpm" "apk" "jad" "jar" "cab" "pak" "pk3" "vdf" "vpk" "bsp"))
+;;   (dired-rainbow-define encrypted "#ffed4a" ("gpg" "pgp" "asc" "bfe" "enc" "signature" "sig" "p12" "pem"))
+;;   (dired-rainbow-define fonts "#6cb2eb" ("afm" "fon" "fnt" "pfb" "pfm" "ttf" "otf"))
+;;   (dired-rainbow-define partition "#e3342f" ("dmg" "iso" "bin" "nrg" "qcow" "toast" "vcd" "vmdk" "bak"))
+;;   (dired-rainbow-define vc "#0074d9" ("git" "gitignore" "gitattributes" "gitmodules"))
+;;   (dired-rainbow-define-chmod executable-unix "#38c172" "-.*x.*"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 70 Writing (org, org-ref, Markdown, Pandoc, bibtex, citar, PDF, LaTeX,
@@ -663,10 +656,10 @@
    'org-babel-load-languages
    '((emacs-lisp . t)))
 
-  ;; Fontify code in code blocks
+  ;; Fontifycode in code blocks
   (setq org-src-fontify-natively t
-    org-src-preserve-indentation t
-    org-src-tab-acts-natively t)
+        org-src-preserve-indentation t
+        org-src-tab-acts-natively t)
 
   ;; Easy edit of Org documents when org-hide-emphasis-markers is turned on.
   (use-package org-appear
@@ -751,7 +744,7 @@
   (setq org-journal-dir "/Users/drew/org/journal/")
   (setq org-journal-date-format "%A, %d %B %Y")
 
-  ;; Org capture (Deprecated date/weektree capture templates changed to ‘file+olp+datetree’.)
+  ;; Org capture (Deprecated date/weektree capture templates changed to file+olp+datetree.)
   (setq org-default-notes-file (concat org-directory "/Users/drew/org/notes/notes.org"))
   (setq org-capture-templates
         '(("t" "Todo" entry (file+headline "/Users/drew/org/todo.org" "Tasks")
@@ -790,10 +783,10 @@
 	        (t             . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*}"))
         bibtex-completion-pdf-open-function
         (lambda (fpath)
-          (call-process "open" nil 0 nil fpath)))
+          (call-process "open" nil 0 nil fpath))))
 
-  ;; Change the bibtex-dialect variable to ’biblatex’.
-  (setq bibtex-dialect 'biblatex))
+;; Change the bibtex-dialect variable to biblatex.
+(setq bibtex-dialect 'biblatex)
 
 ;; Citation management
 (use-package citar
@@ -801,11 +794,10 @@
   :custom
   (citar-bibliography '("~/biblio/core.lib.bib"))
   (setq citar-templates
-      '((main . "${author editor:30%sn}     ${date year issued:4}     ${title:48}")
-        (suffix . "          ${=key= id:15}    ${=type=:12}    ${tags keywords:*}")
-        (preview . "${author editor:%etal} (${year issued date}) ${title}, ${journal journaltitle publisher container-title collection-title}.\n")
-        (note . "Notes on ${author editor:%etal}, ${title}"))))
-
+        '((main . "${author editor:30%sn} ${date year issued:4} ${title:48}")
+          (suffix . " ${=key= id:15} ${=type=:12} ${tags keywords:*}")
+          (preview . "${author editor:%etal} (${year issued date}) ${title}, ${journal journaltitle publisher container-title collection-title}.\n")
+          (note . "Notes on ${author editor:%etal}, ${title}"))))
 
 (use-package org-ref
   :ensure t
@@ -829,11 +821,12 @@
 	      org-ref-cite-onclick-function
         (lambda (_) (org-ref-citation-hydra/body))))
 
-; Pandoc and Pandoc export
-(use-package pandoc
-  :ensure t)
-(use-package ox-pandoc
-  :ensure t)
+;; Pandoc,pandoc-mode and ox-pandoc (for Pandoc export)
+;; iInsalled with 'package-install'.
+;; (use-package pandoc
+;;   :ensure t)
+;; (use-package ox-pandoc
+;;   :ensure t)
 
 ; Markdown
 (use-package markdown-mode
@@ -996,7 +989,7 @@
 (use-package denote
   :config
   ;; Remember to check the doc strings of those variables.
-  (setq denote-directory (expand-file-name "/Users/drew/denote"))
+  (setq denote-directory (expand-file-name "~/denote"))
   (setq denote-known-keywords '("emacs" "philosophy" "theology"))
   (setq denote-infer-keywords t)
   (setq denote-sort-keywords t)
@@ -1088,7 +1081,7 @@
   ;; the local value if they are invoked from that context. For example,
   ;; if ~/Videos/recordings is a silo and ~/Documents/notes is the
   ;; default/global value of denote-director, all Denote commands will
-  ;; read the video’s path when called from there (e.g. by using Emacs’
+  ;; read the video's path when called from there (e.g. by using Emacs
   ;; dired); any other context reads the global value.
   (defvar my-denote-silo-directories
     `("/home/prot/Videos/recordings"
@@ -1127,7 +1120,7 @@
   (add-to-list 'load-path "/Users/drew/gitrepos/denote-menu/")
   (require 'denote-menu)
 
-  (add-to-list 'load-path "~/projects/denote-menu/")
+  ; (add-to-list 'load-path "~/projects/denote-menu/")
 
   (setq denote-menu-title-column-width 40)
 
@@ -1229,7 +1222,7 @@
                  :kill-buffer t
                  :jump-to-captured nil))
 
-  ;; Mark all ’biblio’ tagged entries in denote-directory in Dired and
+  ;; Mark all biblio tagged entries in denote-directory in Dired and
   ;; extract their BiBTeX entries into a single .bib file.
   (defun namilus-denote-biblio-read-bibtex (file)
     "Reads the bibtex entry from a given Denote FILE. Does so by
@@ -1272,7 +1265,7 @@
   (require 'citar-denote)
   (citar-denote-mode)
 
-  ;; Key bindings
+ ;; Key bindings
   (let ((map global-map))
     (define-key map (kbd "C-c n c c") #'citar-create-note)
     (define-key map (kbd "C-c n c o") #'citar-denote-open-note)
@@ -1285,6 +1278,7 @@
     (define-key map (kbd "C-c n c n") #'citar-denote-cite-nocite)
     (define-key map (kbd "C-c n c m") #'citar-denote-reference-nocite))
 )
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 85 Binder
@@ -1575,50 +1569,81 @@ buffer."
 ;; 160 Vertico and Marginalia
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Enable vertico
-(use-package vertico
-  :ensure t
-  ;; Special recipe to load extensions conveniently
-  :straight (vertico :files (:defaults "extensions/*")
-                     :includes (vertico-indexed
-                                vertico-flat
-                                vertico-grid
-                                vertico-mouse
-                                vertico-quick
-                                vertico-buffer
-                                vertico-repeat
-                                vertico-reverse
-                                vertico-directory
-                                vertico-multiform
-                                vertico-unobtrusive
-                                ))
-  :general
-  (:keymaps 'vertico-map
-   "<tab>" #'vertico-insert    ; Choose selected candidate
-   "<escape>" #'minibuffer-keyboard-quit ; Close minibuffer
-   ;; NOTE 2022-02-05: Cycle through candidate groups
-   "C-M-n" #'vertico-next-group
-   "C-M-p" #'vertico-previous-group)
-  :custom
-  (vertico-count 13)                    ; Number of candidates to display
-  (vertico-resize t)
-  (vertico-cycle nil) ; Go from last to first candidate and first to last (cycle)?
-  :config
-  (vertico-mode))
+;; (use-package vertico
+;;   :init
+;;   (vertico-mode)
+
+;;   ;; Different scroll margin
+;;   ;; (setq vertico-scroll-margin 0)
+
+;;   ;; Show more candidates
+;;   ;; (setq vertico-count 20)
+
+;;   ;; Grow and shrink the Vertico minibuffer
+;;   ;; (setq vertico-resize t)
+
+;;   ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
+;;   ;; (setq vertico-cycle t)
+;;   )
+
+;; ;; Persist history over Emacs restarts. Vertico sorts by history position.
+;; (use-package savehist
+;;   :init
+;;   (savehist-mode))
+
+;; ;; A few more useful configurations...
+;; (use-package emacs
+;;   :init
+;;   ;; Add prompt indicator to `completing-read-multiple'.
+;;   ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
+;;   (defun crm-indicator (args)
+;;     (cons (format "[CRM%s] %s"
+;;                   (replace-regexp-in-string
+;;                    "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+;;                    crm-separator)
+;;                   (car args))
+;;           (cdr args)))
+;;   (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+
+;;   ;; Do not allow the cursor in the minibuffer prompt
+;;   (setq minibuffer-prompt-properties
+;;         '(read-only t cursor-intangible t face minibuffer-prompt))
+;;   (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+;;   ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
+;;   ;; Vertico commands are hidden in normal buffers.
+;;   ;; (setq read-extended-command-predicate
+;;   ;;       #'command-completion-default-include-p)
+
+;;   ;; Enable recursive minibuffers
+;;   (setq enable-recursive-minibuffers t))
+
+;; ;; Optionally use the `orderless' completion style.
+;; (use-package orderless
+;;   :init
+;;   ;; Configure a custom style dispatcher (see the Consult wiki)
+;;   ;; (setq orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch)
+;;   ;;       orderless-component-separator #'orderless-escapable-split-on-space)
+;;   (setq completion-styles '(orderless basic)
+;;         completion-category-defaults nil
+;;         completion-category-overrides '((file (styles partial-completion)))))
 
 
-;; Enable rich annotations using the Marginalia package
-(use-package marginalia
-  :ensure t
-  :general
-  (:keymaps 'minibuffer-local-map
-   "M-A" 'marginalia-cycle)
-  :custom
-  (marginalia-max-relative-age 0)
-  (marginalia-align 'right)
-  :init
-  (marginalia-mode))
+;; ;; Enable rich annotations using the Marginalia package
+;; (use-package marginalia
+;;   ;; Bind `marginalia-cycle' locally in the minibuffer.  To make the binding
+;;   ;; available in the *Completions* buffer, add it to the
+;;   ;; `completion-list-mode-map'.
+;;   :bind (:map minibuffer-local-map
+;;          ("M-A" . marginalia-cycle))
 
+;;   ;; The :init section is always executed.
+;;   :init
 
+;;   ;; Marginalia must be activated in the :init section of use-package such that
+;;   ;; the mode gets enabled right away. Note that this forces loading the
+;;   ;; package.
+;;   (marginalia-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 170 Utility functions
@@ -1646,3 +1671,5 @@ buffer."
     (fill-region (region-beginning) (region-end) nil)))
 
 ;; End init.el ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
