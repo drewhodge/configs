@@ -32,6 +32,9 @@
 ;                installed pandoc-related packages with 'package-install'.   ;
 ; 07.Sep.2023    Installed Prot's Pulsar mode; pulse-highlights current line.;
 ;                Changed typface fonts to Iosevka Comfy.                     ;
+; 08.Sep.2023    Installed Prot's Logos mode for defining page breaks that   ;
+;                are useful for reading and writing. See also                ;
+;                'logos-focus-mode'.                                         ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Temporary fix for invalid image type issue, until Emacs 29.x is released.
@@ -431,13 +434,13 @@
   :defer 1)
 
 ;; Use Prot's Pulsar package
-;; Make Elisp files in that directory available to the user.
+;; Make available the elisp files in the following directory:.
 (add-to-list 'load-path "~/gitrepos/emacs-pulsar")
 
 (require 'pulsar)
 
 ;; Check the default value of `pulsar-pulse-functions'.  That is where
-;; you add more commands that should cause a pulse after they are
+;; we add more commands that should cause a pulse after they are
 ;; invoked
 
 (setq pulsar-pulse t)
@@ -458,7 +461,7 @@
 ;;
 ;;     (info "(elisp) Key Binding Conventions")
 ;;
-;; The author uses C-x l for `pulsar-pulse-line' and C-x L for
+;; Prot uses C-x l for `pulsar-pulse-line' and C-x L for
 ;; `pulsar-highlight-line'.
 ;;
 ;; You can replace `pulsar-highlight-line' with the command
@@ -466,6 +469,43 @@
 (let ((map global-map))
   (define-key map (kbd "C-c h p") #'pulsar-pulse-line)
   (define-key map (kbd "C-c h h") #'pulsar-highlight-line))
+
+;; Use Prot's Logos package
+;; Make available the elisp files in the following directory:
+(add-to-list 'load-path "~/gitrepos/emacs-logos")
+
+(require 'logos)
+
+;; To use outlines instead of page breaks (the ^L), set the following variable
+;; to 't'. To insert the '^L' page break delimiter, type 'C-q C-l'.
+(setq logos-outlines-are-pages nil)
+
+;; Default values for page breaks using outlines:
+(setq logos-outline-regexp-alist
+      `((emacs-lisp-mode . "^;;;+ ")
+        (org-mode . "^\\*+ +")
+        (markdown-mode . "^\\#+ +")))
+
+;; The following settings apply when `logos-focus-mode' is enabled.  Their
+;; values are buffer-local.
+(setq-default logos-hide-cursor nil
+              logos-hide-mode-line t
+              logos-hide-buffer-boundaries t
+              logos-hide-fringe t
+              logos-variable-pitch nil
+              logos-buffer-read-only nil
+              logos-scroll-lock nil
+              logos-olivetti nil)
+
+;; Check the manual for `logos-focus-mode-hook'--it extends `logos-focus-mode'.
+(let ((map global-map))
+  (define-key map [remap narrow-to-region] #'logos-narrow-dwim)
+  (define-key map [remap forward-page] #'logos-forward-page-dwim)
+  (define-key map [remap backward-page] #'logos-backward-page-dwim)
+  (define-key map (kbd "<f9>") #'logos-focus-mode))
+
+;; Consider adding keys to `logos-focus-mode-map'.  They will take
+;; effect when `logos-focus-mode' is enabled.
 
 ;; Put backup files in ~/.trash.
 (setq backup-directory-alist '((".*" . "~/.Trash")))
