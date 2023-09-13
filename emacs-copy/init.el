@@ -35,6 +35,10 @@
 ; 08.Sep.2023    Installed Prot's Logos mode for defining page breaks that   ;
 ;                are useful for reading and writing. See also                ;
 ;                'logos-focus-mode'.                                         ;
+; 13.Sep.2023    Added global settings to remember recent file and           ;
+;                minibuffer history.                                         ;
+;                Added setting to save Emacs customization UI changes to a   ;
+;                custom file, 'custom-vars.el'.                              ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Temporary fix for invalid image type issue, until Emacs 29.x is released.
@@ -433,7 +437,19 @@
 (use-package hydra
   :defer 1)
 
-;; Use Prot's Pulsar package
+;; Remeber recent files
+(recentf-mode 1)
+
+;; Remember minibuffer history
+(setq history-length 25)
+(savehist-mode 1)
+
+;; Change location of 'custom file'
+;; Moves customiztion variable to a file other than init.el and loads the file.
+(setq custom-file (locate-user-emacs-file "custom-vars.el"))
+(load custom-file 'noerror 'nomessage)
+
+;; Use Prot's Pulsar package (show and highlight current line)
 ;; Make available the elisp files in the following directory:.
 (add-to-list 'load-path "~/gitrepos/emacs-pulsar")
 
@@ -470,7 +486,7 @@
   (define-key map (kbd "C-c h p") #'pulsar-pulse-line)
   (define-key map (kbd "C-c h h") #'pulsar-highlight-line))
 
-;; Use Prot's Logos package
+;; Use Prot's Logos package (for easier paging)
 ;; Make available the elisp files in the following directory:
 (add-to-list 'load-path "~/gitrepos/emacs-logos")
 
@@ -510,6 +526,7 @@
 ;; Put backup files in ~/.trash.
 (setq backup-directory-alist '((".*" . "~/.Trash")))
 
+;; Enter debug mode when encountering an error.
 (setq set-debug-on-error t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1752,5 +1769,3 @@ buffer."
     (fill-region (region-beginning) (region-end) nil)))
 
 ;; End init.el ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
