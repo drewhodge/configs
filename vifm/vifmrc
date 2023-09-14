@@ -17,7 +17,7 @@
 " for opening files via l/Enter keys.  Comment that line out to change the
 " behaviour.
 if executable('vim')
-    set vicmd=vim
+    set vicmd=nvim
 elseif executable('nvim')
     set vicmd=nvim
 elseif executable('elvis')
@@ -354,7 +354,9 @@ fileviewer {*.docx},
 " set viewcolumns=-{name}..,6{}.
 
 " Show vertical border
-" set fillchars=vborder:│
+" set fillchars='vborder:│'
+set fillchars='vborder:│','hborder:│'
+highlight Border cterm=none ctermfg=214 ctermbg=none
 
 " Filter-out build and temporary files
 " filter! {*.lo,*.o,*.d,*.class,*.pyc,*.pyo,.*~}
