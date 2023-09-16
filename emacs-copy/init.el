@@ -39,6 +39,7 @@
 ;                minibuffer history.                                         ;
 ;                Added setting to save Emacs customization UI changes to a   ;
 ;                custom file, 'custom-vars.el'.                              ;
+; 15.Sep.2023    Disabled audio 'bell' and enabled 'visual bell'.            ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Temporary fix for invalid image type issue, until Emacs 29.x is released.
@@ -327,6 +328,10 @@
  ;; (evil-collection-init '(calendar dired calc ediff))
  ;; Register modes all at once.
  (evil-collection-init))
+
+;; Turn off sounds and enable 'visual bell'.
+(setq ring-bell-function 'ignore)
+(setq visible-bell t)
 
 ;; Define prefixed key bindings.
 (use-package general
