@@ -40,6 +40,9 @@
 ;                Added setting to save Emacs customization UI changes to a   ;
 ;                custom file, 'custom-vars.el'.                              ;
 ; 15.Sep.2023    Disabled audio 'bell' and enabled 'visual bell'.            ;
+; 16.Sep.2023    Updated settings for Vertico and Marginalia packages;       ;
+;                removed all IDO and IVY code; removed all redundant code;   ;
+;                renumbered all sections.                                    ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Temporary fix for invalid image type issue, until Emacs 29.x is released.
@@ -49,7 +52,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 00 Table of contents
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; (occur "^;; [0-9]+")
+(occur "^;; [0-9]+")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 10 Name, email, int file location
@@ -130,25 +133,7 @@
 (load-theme 'gruvbox-dark-medium :no-confirm)
 ;(load-theme 'gruvbox-dark-hard :no-confirm)
 
-;; (use-package doom-themes
-;;   :ensure t
-;;   :config
-;;   ;; Global settings (defaults)
-;;   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-;;         doom-themes-enable-italic t) ; if nil, italics is universally disabled
-;;   (load-theme 'doom-gruvbox t)
-
-;;   ;; Enable flashing mode-line on errors
-;;   (doom-themes-visual-bell-config)
-;;   ;; Enable custom neotree theme (all-the-icons must be installed!)
-;;   (doom-themes-neotree-config)
-;;   ;; or for treemacs
-;;   (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
-;;   (doom-themes-treemacs-config)
-;;   ;; Corrects (and improves) org-mode's native fontification.
-;;   (doom-themes-org-config))
-
-;; ;; Ef-themes
+;; Ef-themes
 ;; ;; Make customisations that affect Emacs faces BEFORE loading a theme
 ;; ;; (any change needs a theme re-load to take effect).
 ;; (require 'ef-themes)
@@ -372,13 +357,6 @@
 ; Use ibuffer
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 
-; IDO mode
-(setq ido-enable-flex-matching t)
-(setq ido-everywhere t)
-(setq ido-use-url-at-point t)
-(setq ido-create-new-buffer 'always)
-(ido-mode 1)
-
 ; Show tool tips in echo area
 (tooltip-mode -1)
 (setq tooltip-use-echo-area t)
@@ -535,129 +513,7 @@
 (setq set-debug-on-error t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; 50 Navigation (Ivy, Counsel, Swiper)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(use-package ivy
-  :diminish
-  :bind (("C-s" . swiper)
-         :map ivy-minibuffer-map
-         ("TAB" . ivy-alt-done)
-         ("C-f" . ivy-alt-done)
-         ("C-l" . ivy-alt-done)
-         ("C-j" . ivy-next-line)
-         ("C-k" . ivy-previous-line)
-         :map ivy-switch-buffer-map
-         ("C-k" . ivy-previous-line)
-         ("C-l" . ivy-done)
-         ("C-d" . ivy-switch-buffer-kill)
-         :map ivy-reverse-i-search-map
-         ("C-k" . ivy-previous-line)
-         ("C-d" . ivy-reverse-i-search-kill))
-  :init
-  (ivy-mode 1)
-  :config
-  (setq ivy-use-virtual-buffers t)
-  (setq ivy-wrap t)
-  (setq ivy-count-format "(%d/%d) ")
-  (setq enable-recursive-minibuffers t)
-
-  ;; Use different regex strategies per completion command
-  (push '(completion-at-point . ivy--regex-fuzzy) ivy-re-builders-alist) ;; This doesn't seem to work...
-  (push '(swiper . ivy--regex-ignore-order) ivy-re-builders-alist)
-  (push '(counsel-M-x . ivy--regex-ignore-order) ivy-re-builders-alist)
-
-  ;; Set minibuffer height for different commands
-  (setf (alist-get 'counsel-projectile-ag ivy-height-alist) 15)
-  (setf (alist-get 'counsel-projectile-rg ivy-height-alist) 15)
-  (setf (alist-get 'swiper ivy-height-alist) 15)
-  (setf (alist-get 'counsel-switch-buffer ivy-height-alist) 7))
-
-(use-package ivy-hydra
-  :defer t
-  :after hydra)
-
-(use-package ivy-rich
-  :init
-  (ivy-rich-mode 1)
-  :after counsel
-  :config
-  (setq ivy-format-function #'ivy-format-function-line)
-  (setq ivy-rich-display-transformers-list
-        (plist-put ivy-rich-display-transformers-list
-                   'ivy-switch-buffer
-                   '(:columns
-                     ((ivy-rich-candidate (:width 40))
-                      (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right)); return the buffer indicators.
-                      (ivy-rich-switch-buffer-major-mode (:width 12 :face warning))          ; return the major mode info.
-                      (ivy-rich-switch-buffer-project (:width 15 :face success))             ; return project name using `projectile'
-                      (ivy-rich-switch-buffer-path (:width (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3))))))
-                     ; Return file path relative to project root or `default-directory' if project is nil.
-                     :predicate
-                     (lambda (cand)
-                       (if-let ((buffer (get-buffer cand)))
-                           ;; Don't mess with EXWM buffers.
-                           (with-current-buffer buffer
-                             (not (derived-mode-p 'exwm-mode)))))))))
-
-(use-package counsel
-  :demand t
-  :bind (("M-x" . counsel-M-x)
-         ("C-x b" . counsel-ibuffer)
-         ("C-x C-f" . counsel-find-file)
-         ;; ("C-M-j" . counsel-switch-buffer)
-         ("C-M-l" . counsel-imenu)
-         :map minibuffer-local-map
-         ("C-r" . 'counsel-minibuffer-history))
-  :custom
-  (counsel-linux-app-format-function #'counsel-linux-app-format-function-name-only)
-  :config
-  (setq ivy-initial-inputs-alist nil)) ;; Don't start searches with ^.
-
-(use-package flx  ;; Improves sort for fuzzy-matched results.
-  :after ivy
-  :defer t
-  :init
-  (setq ivy-flx-limit 10000))
-
-(use-package wgrep)
-
-(use-package ivy-posframe
-  :disabled
-  :custom
-  (ivy-posframe-width      115)
-  (ivy-posframe-min-width  115)
-  (ivy-posframe-height     10)
-  (ivy-posframe-min-height 10)
-  :config
-  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-center)))
-  (setq ivy-posframe-parameters '((parent-frame . nil)
-                                  (left-fringe . 8)
-                                  (right-fringe . 8)))
-  (ivy-posframe-mode 1))
-
-(use-package prescient
-  :after counsel
-  :config
-  (prescient-persist-mode 1))
-
-(use-package ivy-prescient
-  :after prescient
-  :config
-  (ivy-prescient-mode 1))
-
-(dh/leader-key-def
-  "r"   '(ivy-resume :which-key "ivy resume")
-  "f"   '(:ignore t :which-key "files")
-  "ff"  '(counsel-find-file :which-key "open file")
-  "C-f" 'counsel-find-file
-  "fr"  '(counsel-recentf :which-key "recent files")
-  "fR"  '(revert-buffer :which-key "revert file")
-  "fj"  '(counsel-file-jump :which-key "jump to file"))
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; 60 File management (dired)
+;; 50 File management (dired)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Specific dired settings
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)
@@ -679,33 +535,8 @@
 (use-package diredc
   :ensure t)
 
-;; Identify file types by colour.
-;; (use-package dired-rainbow
-;;   :defer 2
-;;   :config
-;;   (dired-rainbow-define-chmod directory "#6cb2eb" "d.*")
-;;   (dired-rainbow-define html "#eb5286" ("css" "less" "sass" "scss" "htm" "html" "jhtm" "mht" "eml" "mustache" "xhtml"))
-;;   (dired-rainbow-define xml "#f2d024" ("xml" "xsd" "xsl" "xslt" "wsdl" "bib" "json" "msg" "pgn" "rss" "yaml" "yml" "rdata"))
-;;   (dired-rainbow-define document "#9561e2" ("docm" "doc" "docx" "odb" "odt" "pdb" "pdf" "ps" "rtf" "djvu" "epub" "odp" "ppt" "pptx"))
-;;   (dired-rainbow-define markdown "#ffed4a" ("org" "etx" "info" "markdown" "md" "mkd" "nfo" "pod" "rst" "tex" "textfile" "txt"))
-;;   (dired-rainbow-define database "#6574cd" ("xlsx" "xls" "csv" "accdb" "db" "mdb" "sqlite" "nc"))
-;;   (dired-rainbow-define media "#de751f" ("mp3" "mp4" "mkv" "MP3" "MP4" "avi" "mpeg" "mpg" "flv" "ogg" "mov" "mid" "midi" "wav" "aiff" "flac"))
-;;   (dired-rainbow-define image "#f66d9b" ("tiff" "tif" "cdr" "gif" "ico" "jpeg" "jpg" "png" "psd" "eps" "svg"))
-;;   (dired-rainbow-define log "#c17d11" ("log"))
-;;   (dired-rainbow-define shell "#f6993f" ("awk" "bash" "bat" "sed" "sh" "zsh" "vim"))
-;;   (dired-rainbow-define interpreted "#38c172" ("py" "ipynb" "rb" "pl" "t" "msql" "mysql" "pgsql" "sql" "r" "clj" "cljs" "scala" "js"))
-;;   (dired-rainbow-define compiled "#4dc0b5" ("asm" "cl" "lisp" "el" "c" "h" "c++" "h++" "hpp" "hxx" "m" "cc" "cs" "cp" "cpp" "go" "f" "for" "ftn" "f90" "f95" "f03" "f08" "s" "rs" "hi" "hs" "pyc" ".java"))
-;;   (dired-rainbow-define executable "#8cc4ff" ("exe" "msi"))
-;;   (dired-rainbow-define compressed "#51d88a" ("7z" "zip" "bz2" "tgz" "txz" "gz" "xz" "z" "Z" "jar" "war" "ear" "rar" "sar" "xpi" "apk" "xz" "tar"))
-;;   (dired-rainbow-define packaged "#faad63" ("deb" "rpm" "apk" "jad" "jar" "cab" "pak" "pk3" "vdf" "vpk" "bsp"))
-;;   (dired-rainbow-define encrypted "#ffed4a" ("gpg" "pgp" "asc" "bfe" "enc" "signature" "sig" "p12" "pem"))
-;;   (dired-rainbow-define fonts "#6cb2eb" ("afm" "fon" "fnt" "pfb" "pfm" "ttf" "otf"))
-;;   (dired-rainbow-define partition "#e3342f" ("dmg" "iso" "bin" "nrg" "qcow" "toast" "vcd" "vmdk" "bak"))
-;;   (dired-rainbow-define vc "#0074d9" ("git" "gitignore" "gitattributes" "gitmodules"))
-;;   (dired-rainbow-define-chmod executable-unix "#38c172" "-.*x.*"))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; 70 Writing (org, org-ref, Markdown, Pandoc, bibtex, citar, PDF, LaTeX,
+;; 60 Writing (org, org-ref, Markdown, Pandoc, bibtex, citar, PDF, LaTeX,
 ;;             org-static-blog)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Note org-mode and auctex have beenm installed using 'list-packages'.
@@ -767,12 +598,6 @@
   ;; Easy edit of Org documents when org-hide-emphasis-markers is turned on.
   (use-package org-appear
     :hook (org-mode . org-appear-mode))
-
-  ;; ;; Heading bullets
-  ;; (use-package org-bullets
-  ;;   :hook (org-mode . org-bullets-mode)
-  ;;   :config
-  ;;   (setq org-bullets-bullet-list '("■" "■" "■" "■" "■" "■")))
 
   ;; Heading colurs
   (set-face-attribute 'org-level-1 nil :foreground "#6495ed")
@@ -916,7 +741,7 @@
   (define-key bibtex-mode-map (kbd "H-b") 'org-ref-bibtex-hydra/body)
   (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
   (define-key org-mode-map (kbd "s-[") 'org-ref-insert-link-hydra/body)
-  (require 'org-ref-ivy)
+  ;(require 'org-ref-ivy)
   (setq org-ref-insert-link-function 'org-ref-insert-link-hydra/body
 	      org-ref-insert-cite-function 'org-ref-cite-insert-ivy
 	      org-ref-insert-label-function 'org-ref-insert-label-link
@@ -1075,7 +900,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; 80 Notes
+;; 70 Notes
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Deft
 (use-package deft
@@ -1384,19 +1209,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; 85 Binder
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Binder is global minor mode to facilitate working on a writing project in
-;; multiple files. It is heavily inspired by the binder feature in the macOS
-;; writing app Scrivener.
-(use-package binder
-  :ensure t
-  :config
-  (require 'binder-tutorial))
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; 90 Calendar
+;; 80 Calendar
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (setq calendar-intermonth-text
       '(propertize
@@ -1414,7 +1227,7 @@
 (custom-theme-set-faces 'user '(calendar-today ((t :background "red"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; 100 Shells
+;; 90 Shells
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; vterm
 (use-package vterm
@@ -1423,7 +1236,7 @@
   (setq vterm-max-scrollback 10000))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; 110 Programming
+;; 100 Programming
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Lisp
 (use-package sly
@@ -1487,7 +1300,7 @@
       ediff-window-setup-function 'ediff-setup-windows-plain)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; 120 Version control
+;; 110 Version control
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Git
 (use-package magit
@@ -1506,7 +1319,7 @@
          (prog-mode . git-gutter-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; 130 Sagemath
+;; 120 Sagemath
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Use sage-shell-mode
 (use-package sage-shell-mode
@@ -1554,7 +1367,7 @@
   (add-hook 'org-babel-after-execute-hook 'org-display-inline-images))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; 150 EWW setup (Emacs web browser)
+;; 130 EWW setup (Emacs web browser)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; EWW -- with the navigational comfort and control you get when proficient in
 ;; emacs, eww is a powerful addition to a VERY powerful research and
@@ -1669,87 +1482,36 @@ buffer."
   (bind-key "<C-m> z" 'eww-browser/body))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; 160 Vertico and Marginalia
+;; 140 Vertico and Marginalia--minibuffer completion
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Enable vertico
-;; (use-package vertico
-;;   :init
-;;   (vertico-mode)
+(use-package vertico
+  :init
+  (vertico-mode)
+  :custom
+  (vertico-sort-function 'vertico-sort-history-alpha))
 
-;;   ;; Different scroll margin
-;;   ;; (setq vertico-scroll-margin 0)
+;; Persist history over Emacs restarts.
+(use-package savehist
+  :init
+  (savehist-mode))
 
-;;   ;; Show more candidates
-;;   ;; (setq vertico-count 20)
+(use-package orderless
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-defaults nil)
+  (completion-category-overrides
+   '((file (styles partial-completion)))))
 
-;;   ;; Grow and shrink the Vertico minibuffer
-;;   ;; (setq vertico-resize t)
-
-;;   ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
-;;   ;; (setq vertico-cycle t)
-;;   )
-
-;; ;; Persist history over Emacs restarts. Vertico sorts by history position.
-;; (use-package savehist
-;;   :init
-;;   (savehist-mode))
-
-;; ;; A few more useful configurations...
-;; (use-package emacs
-;;   :init
-;;   ;; Add prompt indicator to `completing-read-multiple'.
-;;   ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
-;;   (defun crm-indicator (args)
-;;     (cons (format "[CRM%s] %s"
-;;                   (replace-regexp-in-string
-;;                    "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-;;                    crm-separator)
-;;                   (car args))
-;;           (cdr args)))
-;;   (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
-
-;;   ;; Do not allow the cursor in the minibuffer prompt
-;;   (setq minibuffer-prompt-properties
-;;         '(read-only t cursor-intangible t face minibuffer-prompt))
-;;   (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
-
-;;   ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
-;;   ;; Vertico commands are hidden in normal buffers.
-;;   ;; (setq read-extended-command-predicate
-;;   ;;       #'command-completion-default-include-p)
-
-;;   ;; Enable recursive minibuffers
-;;   (setq enable-recursive-minibuffers t))
-
-;; ;; Optionally use the `orderless' completion style.
-;; (use-package orderless
-;;   :init
-;;   ;; Configure a custom style dispatcher (see the Consult wiki)
-;;   ;; (setq orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch)
-;;   ;;       orderless-component-separator #'orderless-escapable-split-on-space)
-;;   (setq completion-styles '(orderless basic)
-;;         completion-category-defaults nil
-;;         completion-category-overrides '((file (styles partial-completion)))))
-
-
-;; ;; Enable rich annotations using the Marginalia package
-;; (use-package marginalia
-;;   ;; Bind `marginalia-cycle' locally in the minibuffer.  To make the binding
-;;   ;; available in the *Completions* buffer, add it to the
-;;   ;; `completion-list-mode-map'.
-;;   :bind (:map minibuffer-local-map
-;;          ("M-A" . marginalia-cycle))
-
-;;   ;; The :init section is always executed.
-;;   :init
-
-;;   ;; Marginalia must be activated in the :init section of use-package such that
-;;   ;; the mode gets enabled right away. Note that this forces loading the
-;;   ;; package.
-;;   (marginalia-mode))
+;; Enable richer annotations using the Marginalia package
+(use-package marginalia
+  :bind (:map minibuffer-local-map
+	 ("M-A". marginalia-cycle))
+  :init
+  (marginalia-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; 170 Utility functions
+;; 150 Utility functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Google queries -- M-x google
 (defun google ()
