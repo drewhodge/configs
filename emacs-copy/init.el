@@ -40,9 +40,11 @@
 ;                Added setting to save Emacs customization UI changes to a   ;
 ;                custom file, 'custom-vars.el'.                              ;
 ; 15.Sep.2023    Disabled audio 'bell' and enabled 'visual bell'.            ;
-; 16.Sep.2023    Updated settings for Vertico and Marginalia packages;       ;
+; 17.Sep.2023    Updated settings for Vertico and Marginalia packages;       ;
 ;                removed all IDO and IVY code; removed all redundant code;   ;
 ;                renumbered all sections.                                    ;
+;                Commented out refernece to org-appear and org-modules --    ;
+;                they were causing post-load-hook errors.                    ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Temporary fix for invalid image type issue, until Emacs 29.x is released.
@@ -52,7 +54,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 00 Table of contents
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(occur "^;; [0-9]+")
+;(occur "^;; [0-9]+")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 10 Name, email, int file location
@@ -573,10 +575,10 @@
         org-startup-folded 'content
         org-cycle-separator-lines 2)
 
-  (setq org-modules
-        '(org-crypt
-          org-habit
-          org-bookmark))
+  ;; (setq org-modules
+  ;;       '(org-crypt
+  ;;         org-habit
+  ;;         org-bookmark))
 
   (setq org-refile-targets '((nil :maxlevel . 1)
                              (org-agenda-files :maxlevel . 1)))
@@ -594,10 +596,6 @@
   (setq org-src-fontify-natively t
         org-src-preserve-indentation t
         org-src-tab-acts-natively t)
-
-  ;; Easy edit of Org documents when org-hide-emphasis-markers is turned on.
-  (use-package org-appear
-    :hook (org-mode . org-appear-mode))
 
   ;; Heading colurs
   (set-face-attribute 'org-level-1 nil :foreground "#6495ed")
@@ -683,6 +681,10 @@
            "* %? |- (%:description) :BOOKMARK:\n:PROPERTIES:\n:CREATED: %U\n:Source: %:link\n:END:\n%i\n")
           ("s" "Selection from browser" entry (file "/Users/drew/org//inbox/inbox.org")
            "* %? :BOOKMARK:\n%(replace-regexp-in-string \"\n.*\" \"\" \"%i\")\n:PROPERTIES:\n:CREATED: %U\n:Source: %:link\n:END:\n%i\n"))))
+
+;; Easy edit of Org documents when org-hide-emphasis-markers is turned on.
+;; (use-package org-appear
+;;   :hook (org-mode . org-appear-mode))
 
 ;; Auto-tangle
 ;; Add the option '#+auto_tangle: t' in the org file front matter.
