@@ -45,6 +45,8 @@
 ;                renumbered all sections.                                    ;
 ;                Commented out refernece to org-appear and org-modules --    ;
 ;                they were causing post-load-hook errors.                    ;
+; 21.Sep.2023    Added code to disable display-line-numbers-mode when        ;
+;                working with PDF files.                                     ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Temporary fix for invalid image type issue, until Emacs 29.x is released.
@@ -899,7 +901,9 @@
                      '(:box (:color "red" :style solid) :background "#000000")
                      '(CATEGORY "review" help-echo "Review this")))
 
-
+;; Disable linum mode when working with PDFs
+(add-hook 'pdf-tools-mode-hook (lambda() (display-line-numbers-mode -1)))
+(add-hook 'pdf-view-mode-hook (lambda() (display-line-numbers-mode -1)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 70 Notes
