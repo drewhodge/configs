@@ -854,7 +854,7 @@
   :custom
   (org-remark-notes-file-name #'org-remark-notes-file-name-function)
   :config
-  ; (org-remark-global-tracking-mode +1)
+  (org-remark-global-tracking-mode +1)
 
   ;; Optional if you would like to highlight websites via eww-mode
   (with-eval-after-load 'eww
@@ -882,23 +882,24 @@
 
   ;; Set up custom pens.
   (org-remark-create "highlight-y"
-                     '(:box (:color "#cd661d" :style solid) :background "#000000")
+                     '(:box (:color "#cd661d" :style solid))
                      '(CATEGORY "takenote" help-echo "NB"))
   (org-remark-create "highlight-r"
-                     '(:box (:color "#b22222"  :style solid) :background "#000000")
+                     '(:box (:color "#b22222"  :style solid))
                      '(CATEGORY "idea" help-echo "Idea/Claim/Statement"))
   (org-remark-create "highlight-b"
-                     '(:box (:color "#1e90ff"  :style solid) :background "#000000")
+                     '(:box (:color "#1e90ff"  :style solid))
                      '(CATEGORY "connection" help-echo "Connection..."))
   (org-remark-create "highlight-g"
-                     '(:box (:color "#00cd00"  :style solid) :background "#000000")
+                     '(:box (:color "#00cd00"  :style solid))
                      '(CATEGORY "argument-proof" help-echo "Argument/Proof/Conclusioon"))
   ;; Override default pens.
   (org-remark-create "yellow"
-                     '(:box "gold" :background "#000000")
+                     '(:box "gold")
+                    ; '(:box "gold")
                      '(CATEGORY "important"))
   (org-remark-create "red-line"
-                     '(:box (:color "red" :style solid) :background "#000000")
+                     '(:box (:color "red" :style solid))
                      '(CATEGORY "review" help-echo "Review this")))
 
 ;; Disable linum mode when working with PDFs
