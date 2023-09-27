@@ -47,6 +47,8 @@
 ;                they were causing post-load-hook errors.                    ;
 ; 21.Sep.2023    Added code to disable display-line-numbers-mode when        ;
 ;                working with PDF files.                                     ;
+; 25.Sep.2023    Minor change to org-remark pen styles (0 and 1).            ;
+; 26.Sep.2023    Pointed explicitly to aspel and set up ispell.              ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Temporary fix for invalid image type issue, until Emacs 29.x is released.
@@ -317,6 +319,12 @@
  ;; (evil-collection-init '(calendar dired calc ediff))
  ;; Register modes all at once.
  (evil-collection-init))
+
+;; Spelling
+(setq ispell-program-name "/usr/local/bin/aspell")
+(setq ispell-dictionary "en_GB")
+(setq ispell-program-name "aspell")
+(setq ispell-silently-savep t)
 
 ;; Turn off sounds and enable 'visual bell'.
 (setq ring-bell-function 'ignore)
@@ -872,8 +880,8 @@
     (define-key org-remark-mode-map (kbd "C-c n r") #'org-remark-remove)
     (define-key org-remark-mode-map (kbd "C-c n x") #'org-remark-delete)
     (define-key org-remark-mode-map (kbd "C-c n t") #'org-remark-toggle)
-    (define-key org-remark-mode-map (kbd "C-c n 0") #'org-remark-mark-yellow) ; yellow box (default pen)
-    (define-key org-remark-mode-map (kbd "C-c n 1") #'org-remark-mark-red-line) ; red box (default pen)
+    (define-key org-remark-mode-map (kbd "C-c n 0") #'org-remark-mark-yellow) ; yellow underline (default pen)
+    (define-key org-remark-mode-map (kbd "C-c n 1") #'org-remark-mark-red-line) ; red underline (default pen)
     (define-key org-remark-mode-map (kbd "C-c n 2") #'org-remark-mark-highlight-b) ; #1e90ff box
     (define-key org-remark-mode-map (kbd "C-c n 3") #'org-remark-mark-highlight-g) ; #00cd00 box
     (define-key org-remark-mode-map (kbd "C-c n 4") #'org-remark-mark-highlight-r) ; #b22222 box
@@ -895,12 +903,13 @@
                      '(CATEGORY "argument-proof" help-echo "Argument/Proof/Conclusioon"))
   ;; Override default pens.
   (org-remark-create "yellow"
-                     '(:box "gold")
+                     '(:underline "gold")
                     ; '(:box "gold")
                      '(CATEGORY "important"))
   (org-remark-create "red-line"
-                     '(:box (:color "red" :style solid))
+                     '(:underline (:color "red" :style solid))
                      '(CATEGORY "review" help-echo "Review this")))
+
 
 ;; Disable linum mode when working with PDFs
 (add-hook 'pdf-tools-mode-hook (lambda() (display-line-numbers-mode -1)))
@@ -1212,8 +1221,7 @@
     (define-key map (kbd "C-c n c f") #'citar-denote-find-citation)
     (define-key map (kbd "C-c n c n") #'citar-denote-cite-nocite)
     (define-key map (kbd "C-c n c m") #'citar-denote-reference-nocite))
-)
-
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 80 Calendar
@@ -1541,5 +1549,6 @@ buffer."
   (interactive)
   (let ((fill-column (point-max)))
     (fill-region (region-beginning) (region-end) nil)))
+
 
 ;; End init.el ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
