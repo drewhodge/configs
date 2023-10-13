@@ -49,6 +49,7 @@
 ;                working with PDF files.                                     ;
 ; 25.Sep.2023    Minor change to org-remark pen styles (0 and 1).            ;
 ; 26.Sep.2023    Pointed explicitly to aspel and set up ispell.              ;
+; 13.Oct.2023    Installed and configured org-side-tree package.             ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Temporary fix for invalid image type issue, until Emacs 29.x is released.
@@ -760,6 +761,10 @@
 	      org-ref-insert-ref-function 'org-ref-insert-ref-link
 	      org-ref-cite-onclick-function
         (lambda (_) (org-ref-citation-hydra/body))))
+
+;; Org side tree
+  (add-to-list 'load-path "/Users/drew/gitrepos/emacs-org-side-tree/")
+  (require 'org-side-tree)
 
 ;; Pandoc,pandoc-mode and ox-pandoc (for Pandoc export)
 ;; iInsalled with 'package-install'.
