@@ -50,6 +50,7 @@
 ; 25.Sep.2023    Minor change to org-remark pen styles (0 and 1).            ;
 ; 26.Sep.2023    Pointed explicitly to aspel and set up ispell.              ;
 ; 13.Oct.2023    Installed and configured org-side-tree package.             ;
+; 27.Oct.2023    Added config for simple-httpd, for website development.     ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Temporary fix for invalid image type issue, until Emacs 29.x is released.
@@ -860,6 +861,10 @@
   ;;   the blog posts
   (setq org-static-blog-index-front-matter
         "<h1> Welcome to my blog </h1>\n"))
+
+;; Local webserver to test sites under development.
+(use-package simple-httpd
+  :ensure t)
 
 ;; Setup org-remark
 (use-package org-remark
