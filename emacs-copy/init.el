@@ -51,6 +51,10 @@
 ; 26.Sep.2023    Pointed explicitly to aspel and set up ispell.              ;
 ; 13.Oct.2023    Installed and configured org-side-tree package.             ;
 ; 27.Oct.2023    Added config for simple-httpd, for website development.     ;
+; 22.Jan.2024    Updated config for Denote, to take advantage of latest      ;
+;                features (release 2.2.x).                                   ;
+;                Also reset key bindings for citar-denote to avoid conflicts ;
+;                with denote key mindings.                                   ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Temporary fix for invalid image type issue, until Emacs 29.x is released.
@@ -981,7 +985,14 @@
               ;(thread-last denote-directory (expand-file-name "attachments"))
               (expand-file-name "~/denote")))
 
+  ; Generic (great if you rename files Denote-style in lots of places):
+  ;; (add-hook 'dired-mode-hook #'denote-dired-mode)
+  ;;
+  ;; OR if only want it in `denote-dired-directories':
   (add-hook 'dired-mode-hook #'denote-dired-mode-in-directories)
+
+  ;; Automatically rename Denote buffers using the `denote-rename-buffer-format'.
+  ;; (denote-rename-buffer-mode 1)
 
   ;; Specify an org-capture template for a standard Denote note.
   (with-eval-after-load 'org-capture
@@ -1008,25 +1019,31 @@
   (let ((map global-map))
     (define-key map (kbd "C-c n j") #'dh-denote-journal) ; our custom command
     (define-key map (kbd "C-c n n") #'denote)
+    (define-key map (kbd "C-c n c") #'denote-region) ; "contents" mnemonic
     (define-key map (kbd "C-c n N") #'denote-type)
     (define-key map (kbd "C-c n d") #'denote-date)
+    (define-key map (kbd "C-c n z") #'denote-signature) ; "zettelkasten" mnemonic
     (define-key map (kbd "C-c n s") #'denote-subdirectory)
     (define-key map (kbd "C-c n t") #'denote-template)
-    ;; Bbind the link-related commands to the `global-map'.
+    ;; If you intend to use Denote with a variety of file types, it is
+    ;; easier to bind the link-related commands to the `global-map', as
+    ;; shown here.  Otherwise follow the same pattern for `org-mode-map',
+    ;; `markdown-mode-map', and/or `text-mode-map'.
     (define-key map (kbd "C-c n i") #'denote-link) ; "insert" mnemonic
     (define-key map (kbd "C-c n I") #'denote-link-add-links)
     (define-key map (kbd "C-c n b") #'denote-link-backlinks)
     (define-key map (kbd "C-c n f f") #'denote-link-find-file)
     (define-key map (kbd "C-c n f b") #'denote-link-find-backlink)
-    ;; `denote-rename-file' can work from any context, so it is
-    ;; bound to the `global-map'.
+    ;; Note that `denote-rename-file' can work from any context, not just
+    ;; Dired bufffers.  That is why we bind it here to the `global-map'.
     (define-key map (kbd "C-c n r") #'denote-rename-file)
     (define-key map (kbd "C-c n R") #'denote-rename-file-using-front-matter))
 
   ;; Key bindings specifically for Dired.
   (let ((map dired-mode-map))
     (define-key map (kbd "C-c C-d C-i") #'denote-link-dired-marked-notes)
-    (define-key map (kbd "C-c C-d C-r") #'denote-dired-rename-marked-files)
+    (define-key map (kbd "C-c C-d C-r") #'denote-dired-rename-files)
+    (define-key map (kbd "C-c C-d C-k") #'denote-dired-rename-marked-files-with-keywords)
     (define-key map (kbd "C-c C-d C-R") #'denote-dired-rename-marked-files-using-front-matter))
 
   ;; Define Denote silos.
@@ -1221,16 +1238,16 @@
 
  ;; Key bindings
   (let ((map global-map))
-    (define-key map (kbd "C-c n c c") #'citar-create-note)
-    (define-key map (kbd "C-c n c o") #'citar-denote-open-note)
-    (define-key map (kbd "C-c n c d") #'citar-denote-dwim)
-    (define-key map (kbd "C-c n c a") #'citar-denote-add-citekey)
-    (define-key map (kbd "C-c n c k") #'citar-denote-remove-citekey)
-    (define-key map (kbd "C-c n c e") #'citar-denote-open-reference-entry)
-    (define-key map (kbd "C-c n c r") #'citar-denote-find-reference)
-    (define-key map (kbd "C-c n c f") #'citar-denote-find-citation)
-    (define-key map (kbd "C-c n c n") #'citar-denote-cite-nocite)
-    (define-key map (kbd "C-c n c m") #'citar-denote-reference-nocite))
+    (define-key map (kbd "C-c m c c") #'citar-create-note)
+    (define-key map (kbd "C-c m c o") #'citar-denote-open-note)
+    (define-key map (kbd "C-c m c d") #'citar-denote-dwim)
+    (define-key map (kbd "C-c m c a") #'citar-denote-add-citekey)
+    (define-key map (kbd "C-c m c k") #'citar-denote-remove-citekey)
+    (define-key map (kbd "C-c m c e") #'citar-denote-open-reference-entry)
+    (define-key map (kbd "C-c m c r") #'citar-denote-find-reference)
+    (define-key map (kbd "C-c m c f") #'citar-denote-find-citation)
+    (define-key map (kbd "C-c m c n") #'citar-denote-cite-nocite)
+    (define-key map (kbd "C-c m c m") #'citar-denote-reference-nocite))
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
