@@ -55,6 +55,11 @@
 ;                features (release 2.2.x).                                   ;
 ;                Also reset key bindings for citar-denote to avoid conflicts ;
 ;                with denote key mindings.                                   ;
+; 30.Jun.2024    Updated to Denote 3.0. Changed to manual installation use-  ;
+;                a Git repo rather than Staright.el 'use-package'.           ;
+;                Change the citar-denote pckage to use a Git repo in prep-   ;
+;                aration for getting the package to work with the latest     ;
+;                release of Denote.                                          ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Temporary fix for invalid image type issue, until Emacs 29.x is released.
@@ -942,10 +947,11 @@
 ;; Denote
 ; [[https://protesilaos.com/emacs/denote#h:a09b70a2-ae0b-4855-ac14-1dddfc8e3241][Denote]]
 ; Denote aims to be a simple-to-use, focused-in-scope, and effective
-; note-taking tool for Emacs.
+                                        ; note-taking tool for Emacs.i
 
-(use-package denote
-  :config
+(add-to-list 'load-path "~/gitrepos/emacs-denote")
+(require 'denote)
+
   ;; Remember to check the doc strings of those variables.
   (setq denote-directory (expand-file-name "~/denote"))
   (setq denote-known-keywords '("emacs" "philosophy" "theology"))
@@ -1228,11 +1234,9 @@
   (defun namilus-denote-dired-generate-bibliography-from-marked ()
     (interactive)
     (namilus-denote-generate-bibliography (dired-get-marked-files nil nil nil t)
-                                          (namilus-denote-bibliography-file-prompt))))
+                                          (namilus-denote-bibliography-file-prompt)))
 
-(use-package citar-denote
-  :ensure t
-  :config
+(add-to-list 'load-path "~/gitrepos/emacs-citar-denote")
   (require 'citar-denote)
   (citar-denote-mode)
 
@@ -1248,7 +1252,7 @@
     (define-key map (kbd "C-c m c f") #'citar-denote-find-citation)
     (define-key map (kbd "C-c m c n") #'citar-denote-cite-nocite)
     (define-key map (kbd "C-c m c m") #'citar-denote-reference-nocite))
-  )
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 80 Calendar
