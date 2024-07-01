@@ -57,9 +57,13 @@
 ;                with denote key mindings.                                   ;
 ; 30.Jun.2024    Updated to Denote 3.0. Changed to manual installation use-  ;
 ;                a Git repo rather than Staright.el 'use-package'.           ;
-;                Change the citar-denote pckage to use a Git repo in prep-   ;
+;                Changed the citar-denote pckage to use a Git repo in prep-  ;
 ;                aration for getting the package to work with the latest     ;
 ;                release of Denote.                                          ;
+; 01.Jul.2024    Changed org config so that org now loads from a local Git   ;
+;                repo.                                                       ;
+;                Removed deprecated 'denote-link-buttonize-buffer' function  ;
+;                --now using 'denote-fontify-links-mode-maybe' (Denote 3.0). ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Temporary fix for invalid image type issue, until Emacs 29.x is released.
@@ -582,8 +586,10 @@
   (visual-line-mode 1))
 
 (use-package org
+  :ensure nil
   :defer t
   :hook (org-mode . dh/org-mode-setup)
+  :load-path ("~/gitrepos/emacs-org/lisp")
   :config
   (setq org-ellipsis "  ..."
         org-hide-emphasis-markers t
@@ -983,7 +989,10 @@
 
   ;; If you use Markdown or plain text files (Org renders links as buttons
   ;; right away)
-  (add-hook 'find-file-hook #'denote-link-buttonize-buffer)
+  ;(add-hook 'find-file-hook #'denote-link-buttonize-buffer)
+  ;; As of Denote ver 3.0.x, the following approach uses Emacs’ fontification
+  ;; mechanism.
+  (add-hook 'text-mode-hook #'denote-fontify-links-mode-maybe)
 
   ;; Fontify specified denote directories in dired.
   (setq denote-dired-directories
