@@ -65,6 +65,7 @@
 ;                Removed deprecated 'denote-link-buttonize-buffer' function  ;
 ;                --now using 'denote-fontify-links-mode-maybe' (Denote 3.0). ;
 ; 06.Aug.2024    Minor correction to dh-denote-journal function.             ;
+; 12.Aug.2024    Added setq command to toggle Greek input method.            ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Temporary fix for invalid image type issue, until Emacs 29.x is released.
@@ -270,15 +271,15 @@
 ;; Typefaces
 ;; Set default typeface
 (set-face-attribute 'default nil
-                    :font "Iosevka Comfy"
-                    ;:font "JetBrains Mono"
+                    ;:font "Iosevka Comfy"
+                    :font "JetBrains Mono"
                     :weight 'light
                     :height 130)
 
 ;; Set the fixed pitch face
 (set-face-attribute 'fixed-pitch nil
-                    :font "Iosevka Comfy"
-                    ;:font "JetBrains Mono"
+                    ;:font "Iosevka Comfy"
+                    :font "JetBrains Mono"
                     :weight 'light
                     :height 130)
 
@@ -427,7 +428,10 @@
 ; ;; Register modes individually, as a list passed to evil-collection-init.
 ; ;; (evil-collection-init '(calendar dired calc ediff))
 ; ;; Register modes all at once.
-; (evil-collection-init))
+                                        ; (evil-collection-init))
+
+;; Toggle input method -- Greek character input and composition (postfix).
+(setq default-input-method "greek-ibycus4")
 
 ;; Spelling
 (setq ispell-program-name "/usr/local/bin/aspell")
@@ -1047,7 +1051,7 @@
 ;; Denote
 ; [[https://protesilaos.com/emacs/denote#h:a09b70a2-ae0b-4855-ac14-1dddfc8e3241][Denote]]
 ; Denote aims to be a simple-to-use, focused-in-scope, and effective
-                                        ; note-taking tool for Emacs.i
+; note-taking tool for Emacs.
 
 (add-to-list 'load-path "~/gitrepos/emacs-denote")
 (require 'denote)
