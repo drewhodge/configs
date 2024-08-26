@@ -1,4 +1,4 @@
-; -------------------------------------------------------------------------- ;
+;-------------------------------------------------------------------------- ;
 ; ~/.emacs.d/init.el                                                         ;
 ; -------------------------------------------------------------------------- ;
 ; History:                                                                   ;
@@ -66,6 +66,11 @@
 ;                --now using 'denote-fontify-links-mode-maybe' (Denote 3.0). ;
 ; 06.Aug.2024    Minor correction to dh-denote-journal function.             ;
 ; 12.Aug.2024    Added setq command to toggle Greek input method.            ;
+; 15.Aug.2024    Added setq command to add fringe indicatore for empty lines ;
+;                in a buffer.                                                ;
+; 26.Aug.2024    Added configuration for consult package.                    ;
+;                Loaded consult-denote package, to integrate consult and     ;
+;                denote capabilities.                                        ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Temporary fix for invalid image type issue, until Emacs 29.x is released.
@@ -220,8 +225,8 @@
 ;; ;; - `ef-themes-preview-colors-current'
 
 ;; Modus themes
-;; ;; Load modus-vivendi-tinted theme and conform that it's safe
-;; ;;; For packaged versions which must use `require'.
+;; Load modus-vivendi-tinted theme and conform that it's safe
+;;; For packaged versions which must use `require'.
 ;; (require 'modus-themes)
 ;; (use-package modus-themes
 ;;   :ensure t
@@ -271,15 +276,15 @@
 ;; Typefaces
 ;; Set default typeface
 (set-face-attribute 'default nil
-                    ;:font "Iosevka Comfy"
-                    :font "JetBrains Mono"
+                    :font "Iosevka Comfy"
+                    ;:font "JetBrains Mono"
                     :weight 'light
                     :height 130)
 
 ;; Set the fixed pitch face
 (set-face-attribute 'fixed-pitch nil
-                    ;:font "Iosevka Comfy"
-                    :font "JetBrains Mono"
+                    :font "Iosevka Comfy"
+                    ;:font "JetBrains Mono"
                     :weight 'light
                     :height 130)
 
@@ -428,7 +433,10 @@
 ; ;; Register modes individually, as a list passed to evil-collection-init.
 ; ;; (evil-collection-init '(calendar dired calc ediff))
 ; ;; Register modes all at once.
-                                        ; (evil-collection-init))
+; (evil-collection-init))
+
+;; SHow empty lines in a buffer
+(setq-default indicate-empty-lines t)
 
 ;; Toggle input method -- Greek character input and composition (postfix).
 (setq default-input-method "greek-ibycus4")
@@ -745,7 +753,7 @@
   ;; (set-face-attribute (car face) nil :font "JetBrains Mono" :weight 'medium :height (cdr face)))
 
   ;; Ensure that anything that should be fixed-pitch in Org files appears that way
-  (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-block nil :inherit 'fixed-pitch)
   (set-face-attribute 'org-table nil  :inherit 'fixed-pitch)
   (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
   (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
@@ -756,8 +764,8 @@
   (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
 
   ;; Get rid of the background on column views
-  (set-face-attribute 'org-column nil :background nil)
-  (set-face-attribute 'org-column-title nil :background nil)
+  (set-face-attribute 'org-column nil)
+  (set-face-attribute 'org-column-title nil)
 
   ;; Src-block template.
   ;; Example: type <el then press Tab to expand the template.
@@ -1360,7 +1368,6 @@
     (define-key map (kbd "C-c m c n") #'citar-denote-cite-nocite)
     (define-key map (kbd "C-c m c m") #'citar-denote-reference-nocite))
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 80 Calendar
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1662,6 +1669,116 @@ buffer."
 	 ("M-A". marginalia-cycle))
   :init
   (marginalia-mode))
+
+;; Example configuration for Consult
+(use-package consult
+  ;; Replace bindings. Lazily loaded by `use-package'.
+  :bind (;; C-c bindings in `mode-specific-map'
+         ("C-c M-x" . consult-mode-command)
+         ("C-c q h" . consult-history)
+         ("C-c q k" . consult-kmacro)
+         ("C-c q m" . consult-man)
+         ("C-c q i" . consult-info)
+         ([remap Info-search] . consult-info)
+         ;; C-x bindings in `ctl-x-map'
+         ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+         ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
+         ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+         ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+         ("C-x t b" . consult-buffer-other-tab)    ;; orig. switch-to-buffer-other-tab
+         ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
+         ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
+         ;; Custom M-# bindings for fast register access
+         ("M-#" . consult-register-load)
+         ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+         ("C-M-#" . consult-register)
+         ;; Other custom bindings
+         ("M-y" . consult-yank-pop)                ;; orig. yank-pop
+         ;; M-g bindings in `goto-map'
+         ("M-g e" . consult-compile-error)
+         ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+         ("M-g g" . consult-goto-line)             ;; orig. goto-line
+         ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
+         ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+         ("M-g m" . consult-mark)
+         ("M-g k" . consult-global-mark)
+         ("M-g i" . consult-imenu)
+         ("M-g I" . consult-imenu-multi)
+         ;; M-s bindings in `search-map'
+         ("M-s d" . consult-find)                  ;; Alternative: consult-fd
+         ("M-s c" . consult-locate)
+         ("M-s g" . consult-grep)
+         ("M-s G" . consult-git-grep)
+         ("M-s r" . consult-ripgrep)
+         ("M-s l" . consult-line)
+         ("M-s L" . consult-line-multi)
+         ("M-s k" . consult-keep-lines)
+         ("M-s u" . consult-focus-lines)
+         ;; Isearch integration
+         ("M-s e" . consult-isearch-history)
+         :map isearch-mode-map
+         ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
+         ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
+         ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+         ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
+         ;; Minibuffer history
+         :map minibuffer-local-map
+         ("M-s" . consult-history)                 ;; orig. next-matching-history-element
+         ("M-r" . consult-history))                ;; orig. previous-matching-history-element
+
+  ;; Enable automatic preview at point in the *Completions* buffer. This is
+  ;; relevant when you use the default completion UI.
+  :hook (completion-list-mode . consult-preview-at-point-mode)
+
+  ;; The :init configuration is always executed (Not lazy)
+  :init
+
+  ;; Optionally configure the register formatting. This improves the register
+  ;; preview for `consult-register', `consult-register-load',
+  ;; `consult-register-store' and the Emacs built-ins.
+  (setq register-preview-delay 0.5
+        register-preview-function #'consult-register-format)
+
+  ;; Optionally tweak the register preview window.
+  ;; This adds thin lines, sorting and hides the mode line of the window.
+  (advice-add #'register-preview :override #'consult-register-window)
+
+  ;; Use Consult to select xref locations with preview
+  (setq xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref)
+
+  ;; Configure other variables and modes in the :config section,
+  ;; after lazily loading the package.
+  :config
+
+  ;; Optionally configure preview. The default value
+  ;; is 'any, such that any key triggers the preview.
+  ;; (setq consult-preview-key 'any)
+  ;; (setq consult-preview-key "M-.")
+  ;; (setq consult-preview-key '("S-<down>" "S-<up>"))
+  ;; For some commands and buffer sources it is useful to configure the
+  ;; :preview-key on a per-command basis using the `consult-customize' macro.
+  (consult-customize
+   consult-theme :preview-key '(:debounce 0.2 any)
+   consult-ripgrep consult-git-grep consult-grep
+   consult-bookmark consult-recent-file consult-xref
+   consult--source-bookmark consult--source-file-register
+   consult--source-recent-file consult--source-project-recent-file
+   ;; :preview-key "M-."
+   :preview-key '(:debounce 0.4 any))
+
+  ;; Optionally configure the narrowing key.
+  ;; Both < and C-+ work reasonably well.
+  (setq consult-narrow-key "<") ;; "C-+"
+
+  ;; Optionally make narrowing help available in the minibuffer.
+  ;; You may want to use `embark-prefix-help-command' or which-key instead.
+  ;; (keymap-set consult-narrow-map (concat consult-narrow-key " ?") #'consult-narrow-help)
+  )
+
+;; Integrate denote with the consult package
+(add-to-list 'load-path "~/gitrepos/emacs-consult-denote")
+(require 'consult-denote)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 150 Utility functions
