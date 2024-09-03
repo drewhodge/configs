@@ -1,9 +1,18 @@
 ; -------------------------------------------------------------------------- ;
-; ~/.emacs.d/init.el                                                         ;
+; ~/.emacs.d/early-init.el                                                   ;
 ; -------------------------------------------------------------------------- ;
 ; History:                                                                   ;
-; 09.Feb.2023    Initial setup.                                              ;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; 02.Sep.2024    Initial setup.                                              ;
+; -------------------------------------------------------------------------- ;
 
-; Stop package.el loading packages before init.el loads.                   
-(setq package-enable-at-startup nil)
+; Initialize installed packages.                   
+(setq package-enable-at-startup t)
+
+; Configure graphical elements.
+(menu-bar-mode -1)
+(scroll-bar-mode -1)
+(tool-bar-mode -1)
+
+; No startup screen
+(setq inhibit-startup-message t)
+
